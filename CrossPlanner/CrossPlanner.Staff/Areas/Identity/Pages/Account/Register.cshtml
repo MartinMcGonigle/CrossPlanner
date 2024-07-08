@@ -1,0 +1,101 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+    var today = DateTime.Now.ToString("yyyy-MM-dd");
+}
+
+<div class="d-flex justify-content-center align-items-center">
+    <div class="col-md-6">
+        <section>
+
+            <div class="text-center">
+                <img src="/images/logo.png" alt="Cross Planner Logo" class="logo" />
+            </div>
+            
+            <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h3>Register your account</h3>
+                        <hr />
+                        
+                        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                        
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.Name" id="affiliate-name" class="form-control" aria-required="true" autofocus />
+                            <label asp-for="Input.Name" class="form-label">Affiliate Name <span class="required">*</span></label>
+                            <span asp-validation-for="Input.Name" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-floating mb-3">
+                            <textarea asp-for="Input.AffiliateAddress" id="affiliate-address" class="form-control" aria-required="true"></textarea>
+                            <label asp-for="Input.AffiliateAddress" class="form-label">Affiliate Address <span class="required">*</span></label>
+                            <span asp-validation-for="Input.AffiliateAddress" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.Phone" id="affiliate-phone-number" class="form-control" aria-required="true" />
+                            <label asp-for="Input.Phone" class="form-label">Affiliate Phone Number <span class="required">*</span></label>
+                            <span asp-validation-for="Input.Phone" class="text-danger"></span>
+                        </div>
+                    
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.AffiliateEmail" id="affiliate-email" class="form-control" aria-required="true" />
+                            <label asp-for="Input.AffiliateEmail" class="form-label">Affiliate Email <span class="required">*</span></label>
+                            <span asp-validation-for="Input.AffiliateEmail" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.FirstName" id="first-name" class="form-control" aria-required="true" />
+                            <label asp-for="Input.FirstName" class="form-label">First Name <span class="required">*</span></label>
+                            <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.LastName" id="last-name" class="form-control" aria-required="true" />
+                            <label asp-for="Input.LastName" class="form-label">Last Name <span class="required">*</span></label>
+                            <span asp-validation-for="Input.LastName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="date" asp-for="Input.DateOfBirth" id="date-of-birth" class="form-control" aria-required="true" max="@today" />
+                            <label asp-for="Input.DateOfBirth" class="form-label">Date Of Birth <span class="required">*</span></label>
+                            <span asp-validation-for="Input.DateOfBirth" class="text-danger"></span>
+                        </div>
+                    
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.Email" id="email" class="form-control" autocomplete="username" aria-required="true" />
+                            <label asp-for="Input.Email" class="form-label">Email <span class="required">*</span></label>
+                            <span asp-validation-for="Input.Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="password" asp-for="Input.Password" id="password" class="form-control" autocomplete="new-password" aria-required="true" />
+                            <label asp-for="Input.Password" class="form-label">Password <span class="required">*</span></label>
+                            <span asp-validation-for="Input.Password" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.ConfirmPassword" id="confirm-password" class="form-control" autocomplete="new-password" aria-required="true" />
+                            <label asp-for="Input.ConfirmPassword" class="form-label">Confirm Password <span class="required">*</span></label>
+                            <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <button id="register-submit" type="submit" class="w-100 btn btn-lg btn-green" disabled><i class="fas fa-user-plus" aria-hidden="true"></i> Register</button>
+                        </div>
+
+                        <div class="mb-1">
+                            <a id="forgot-password" asp-page="./Login">Return to login page</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/register.js"></script>
+}

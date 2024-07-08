@@ -1,0 +1,39 @@
+﻿@page
+@model ConfirmEmailModel
+@{
+    ViewData["Title"] = "Confirm email";
+}
+
+<div class="d-flex justify-content-center align-items-center">
+    <div class="col-md-6">
+        <section>
+            <div class="text-center">
+                <img src="/images/logo.png" alt="Cross Planner Logo" class="logo" />
+            </div>
+            
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h3>Email confirmation</h3>
+                    <hr />
+                    
+                    @if (Model.StatusMessage.StartsWith("Error"))
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            There was an error confirming your email. Please try the confirmation link again, or contact support if the problem persists.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success" role="alert">
+                            Your email has been successfully confirmed! You can now login to your account.
+                        </div>
+                    }
+                    
+                    <div class="mb-1">
+                        <a class="w-100 btn btn-lg btn-green" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back To Login</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

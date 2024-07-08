@@ -1,0 +1,33 @@
+﻿@page
+@model RegisterConfirmationModel
+@{
+    var email = Request.Query["email"];
+    ViewData["Title"] = "Register confirmation";
+}
+
+<div class="d-flex justify-content-center align-items-center">
+    <div class="col-md-6">
+        <section>
+            <div class="text-center">
+                <img src="/images/logo.png" alt="Cross Planner Logo" class="logo" />
+            </div>
+
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h3>Register confirmation</h3>
+                    <hr />
+
+                    <div class="mb-3">
+                        <p class="form-control">An email has been sent to <strong>@email</strong> to confirm your account. Please check your email and follow the instructions to complete your registration.
+                            <br />
+                            If you do not receive the email within a few minutes, please check your spam folder, or you can resend the email confirmation from the login page.</p>
+                    </div>
+
+                    <div class="mb-1">
+                        <a class="w-100 btn btn-lg btn-green" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back To Login</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
