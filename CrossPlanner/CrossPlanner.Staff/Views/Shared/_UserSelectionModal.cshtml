@@ -1,0 +1,33 @@
+﻿<div class="modal" id="userSelectionModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select User</h5>
+                <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="search-user-details-table" class="form-control mb-2" placeholder="Search user.." />
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-details-table"></tbody>
+                </table>
+
+                <div class="alert alert-info" id="user-selection-modal-no-results" style="display: none;">
+                    No users found. Please adjust your search criteria.
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa fa-times" aria-hidden="true"></i> Close</button>
+            </div>
+        </div>
+    </div>
+</div>

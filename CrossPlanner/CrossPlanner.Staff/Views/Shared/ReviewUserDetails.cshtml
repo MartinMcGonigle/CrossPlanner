@@ -1,0 +1,70 @@
+﻿@model ReactivateUserViewModel
+@{
+    ViewData["Title"] = "Review User Details";
+    var today = DateTime.Now.ToString("yyyy-MM-dd");
+}
+
+<div class="d-flex justify-content-center align-items-center">
+    <div class="col-md-5">
+        <section>
+
+            <form id="createForm" method="post">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h3>Review User Details</h3>
+                        <hr />
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                        <input asp-for="ApplicationUserId" type="hidden" />
+                        <input asp-for="ReturnController" type="hidden" />
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="FirstName" id="first-name" class="form-control" aria-required="true" readonly />
+                            <label asp-for="FirstName" class="form-label">First Name <span class="required">*</span></label>
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="LastName" id="last-name" class="form-control" aria-required="true" readonly />
+                            <label asp-for="LastName" class="form-label">Last Name <span class="required">*</span></label>
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="date" asp-for="DateOfBirth" id="date-of-birth" class="form-control" aria-required="true" max="@today" readonly />
+                            <label asp-for="DateOfBirth" class="form-label">Date Of Birth <span class="required">*</span></label>
+                            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Email" id="email" class="form-control" autocomplete="username" aria-required="true" readonly />
+                            <label asp-for="Email" class="form-label">Email <span class="required">*</span></label>
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <select asp-for="Role" id="role" class="form-control" aria-required="true">
+                                <option disabled selected value="">-- Select user role --</option>
+                                @foreach (var userRole in Model.Roles)
+                                {
+                                    <option value="@userRole.Value">@userRole.Text</option>
+                                }
+                            </select>
+                            <label asp-for="Role" class="form-label">Role <span class="required">*</span></label>
+                            <span asp-validation-for="Role" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-1">
+                            <button id="create-submit" type="submit" class="w-100 btn btn-lg btn-green" disabled><i class="fa fa-user-check" aria-hidden="true"></i> Reactivate User Account</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/createAccount.js"></script>
+}

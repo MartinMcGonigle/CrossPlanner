@@ -4,6 +4,7 @@ using System.Text.Encodings.Web;
 using CrossPlanner.Domain.Models;
 using CrossPlanner.Repository.Wrapper;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.WebUtilities;
 
 namespace CrossPlanner.Staff.Areas.Identity.Pages.Account
 {
+    [AllowAnonymous]
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -134,39 +136,33 @@ namespace CrossPlanner.Staff.Areas.Identity.Pages.Account
                     
                     _repositoryWrapper.AffiliateUsersRepository.Create(affiliateUser);
                     await _repositoryWrapper.SaveAsync();
-                    await transaction.CommitAsync();
-                    
-                    _logger.LogInformation("Affiliate, ApplicationUser, and AffiliateUser created successfully.");
 
-                    await EnsureRoleExists("Owner");
+                    await EnsureRolesExist();
+                    var userRoleResult = await _userManager.AddToRoleAsync(user, "SuperUser");
 
-                    var userRoleResult = await _userManager.AddToRoleAsync(user, "Owner");
                     if (userRoleResult.Succeeded)
-                        _logger.LogInformation("User role added.");
-                    else
-                        _logger.LogError($"Unable to add user {user} to the role 'Owner'");
-
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl, email =  Input.Email },
-                        protocol: Request.Scheme);
-
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
+                        await transaction.CommitAsync();
+                        _logger.LogInformation("Affiliate, ApplicationUser, AffiliateUser, and AspNetUserRole created successfully.");
+
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+                        var callbackUrl = Url.Page(
+                            "/Account/ConfirmEmail",
+                            pageHandler: null,
+                            values: new { area = "Identity", userId = user.Id, code = code, returnUrl = returnUrl, email = Input.Email },
+                            protocol: Request.Scheme);
+
+                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
                     }
                     else
                     {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
+                        // If there was an error adding AspNetUser to AspNetUserRoles this gets executed
+                        transaction.Rollback();
                     }
                 }
                 else
@@ -183,11 +179,11 @@ namespace CrossPlanner.Staff.Areas.Identity.Pages.Account
             catch (Exception ex)
             {
                 transaction.Rollback();
-                _logger.LogError($"An error occurred creating Affiliate, ApplicationUser, and AffiliateUser: {ex}");
+                _logger.LogError($"An error occurred creating Affiliate, ApplicationUser, AffiliateUser, and AspNetUserRole: {ex}");
 
                 if (ex.InnerException.Message.Contains(Input.AffiliateEmail, StringComparison.CurrentCultureIgnoreCase))
                 {
-                    ModelState.AddModelError("", $"Affiliate Email '{Input.AffiliateEmail}' is already taken");
+                    ModelState.AddModelError("", $"Affiliate Email '{Input.AffiliateEmail}' is already taken.");
                 }
                 else
                 {
@@ -239,7 +235,15 @@ namespace CrossPlanner.Staff.Areas.Identity.Pages.Account
             return affiliateUser;
         }
 
-        private async Task EnsureRoleExists(string roleName)
+        private async Task EnsureRolesExist()
+        {
+            await CreateRoleIfNotExists("SuperUser");
+            await CreateRoleIfNotExists("Manager");
+            await CreateRoleIfNotExists("Coach");
+            await CreateRoleIfNotExists("Member");
+        }
+
+        private async Task CreateRoleIfNotExists(string roleName)
         {
             var roleExists = await _roleManager.RoleExistsAsync(roleName);
             if (!roleExists)

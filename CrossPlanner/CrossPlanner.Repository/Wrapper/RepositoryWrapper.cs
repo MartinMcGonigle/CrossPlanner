@@ -60,6 +60,21 @@ namespace CrossPlanner.Repository.Wrapper
             }
         }
 
+        private IApplicationUserRepository _applicationUserRepository;
+
+        public IApplicationUserRepository ApplicationUserRepository
+        {
+            get
+            {
+                if (_applicationUserRepository == null)
+                {
+                    _applicationUserRepository = new ApplicationUserRepository(_applicationContext);
+                }
+
+                return _applicationUserRepository;
+            }
+        }
+
         public void Save()
         {
             _applicationContext.SaveChanges();

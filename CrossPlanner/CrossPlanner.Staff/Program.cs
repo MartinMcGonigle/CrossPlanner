@@ -1,10 +1,14 @@
 using CrossPlanner.Domain.Context;
 using CrossPlanner.Domain.Models;
 using CrossPlanner.Repository.Wrapper;
+using CrossPlanner.Service.Authorisation;
+using CrossPlanner.Service.CustomTokenProviders;
 using CrossPlanner.Service.Messages;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +26,8 @@ builder.Services.AddDbContext<ApplicationContext>(options =>
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationContext>()
-    .AddDefaultTokenProviders();
+    .AddDefaultTokenProviders()
+    .AddTokenProvider<EmailConfirmationTokenProvider<ApplicationUser>>("emailconfirmation");
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
@@ -43,6 +48,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 });
 
 builder.Services.Configure<DataProtectionTokenProviderOptions>(options => options.TokenLifespan = TimeSpan.FromHours(4));
+builder.Services.Configure<EmailConfirmationTokenProviderOptions>(opt => opt.TokenLifespan = TimeSpan.FromDays(3));
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -55,9 +61,15 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, MyUserClaimsPrincipalFactory>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+builder.Services.AddDataProtection()
+    .SetApplicationName("CrossPlanner")
+    .PersistKeysToFileSystem(new DirectoryInfo(@"C:\logs\Keys"))
+    .ProtectKeysWithCertificate(builder.Configuration.GetSection("Cert").Value);
 
 var app = builder.Build();
 

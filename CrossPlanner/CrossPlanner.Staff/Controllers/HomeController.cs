@@ -1,9 +1,11 @@
 using CrossPlanner.Staff.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
 namespace CrossPlanner.Staff.Controllers
 {
+    [Authorize(Roles = "SuperUser")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

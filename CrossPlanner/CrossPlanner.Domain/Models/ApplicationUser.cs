@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CrossPlanner.Domain.Models
 {
@@ -20,5 +21,8 @@ namespace CrossPlanner.Domain.Models
         public DateTime DateOfBirth { get; set; }
 
         public bool IsActive { get; set; } = true;
+
+        [NotMapped]
+        public string UserRoles { get; set; }
     }
 }
