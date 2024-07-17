@@ -7,5 +7,7 @@ namespace CrossPlanner.Repository.Interfaces
         public IEnumerable<ApplicationUser> GetAffiliateStaff(int affiliateId);
 
         public Task<IEnumerable<ApplicationUser>> GetDeactivatedUsers();
+
+        public IEnumerable<ApplicationUser> GetAffiliateMembers(int affiliateId);
     }
 }

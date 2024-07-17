@@ -61,7 +61,7 @@ namespace CrossPlanner.Staff.Controllers
             var callbackUrl = Url.Page(
                 "/Account/ConfirmEmail",
                 pageHandler: null,
-                values: new { userId = userId, code = code },
+                values: new { area = "Identity", userId = userId, code = code },
                 protocol: Request.Scheme);
 
             if (role.Trim().ToLower().Contains("member"))

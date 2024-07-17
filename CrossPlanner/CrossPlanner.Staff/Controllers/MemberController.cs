@@ -2,38 +2,38 @@
 using CrossPlanner.Repository.Wrapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CrossPlanner.Staff.Controllers
 {
     [Authorize(Roles = "SuperUser")]
-    public class StaffController : BaseController
+    public class MemberController : BaseController
     {
-        private readonly ILogger<StaffController> _staffLogger;
-        private const string staffLogPrefix = "Ctlr|Staff";
+        private readonly ILogger<MemberController> _memberLogger;
+        private const string memberLogPrefix = "Ctlr|Member";
 
-        public StaffController(
+        public MemberController(
             UserManager<ApplicationUser> userManager,
             IRepositoryWrapper repositoryWrapper,
             IEmailSender emailSender,
-            ILogger<StaffController> logger,
+            ILogger<MemberController> logger,
             IConfiguration configuration,
             RoleManager<IdentityRole> roleManager)
             : base (userManager, repositoryWrapper, emailSender, logger, configuration, roleManager)
         {
-            _staffLogger = logger;
+            _memberLogger = logger;
         }
 
         [HttpGet]
         public IActionResult Index()
         {
             Int32.TryParse(User.FindFirst("Affiliate")?.Value, out int affiliateId);
-            _staffLogger.LogInformation($"{staffLogPrefix} - Attempting to display staff members of affiliate with id {affiliateId}");
+            _memberLogger.LogInformation($"{memberLogPrefix} - Attempting to display members of affiliate with id {affiliateId}");
 
-            var affiliateStaff = _repositoryWrapper.ApplicationUserRepository.GetAffiliateStaff(affiliateId);
+            var affiliateMembers = _repositoryWrapper.ApplicationUserRepository.GetAffiliateMembers(affiliateId);
 
-            return View(affiliateStaff);
+            return View(affiliateMembers);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿@model IEnumerable<ApplicationUser>
-@using System.Security.Claims
 @{
-    ViewData["Title"] = "Staff";
+    ViewData["Title"] = "Members";
 }
 
 @if (Model.Count() > 0)
@@ -14,10 +13,10 @@
                         <partial name="PropertyDetailsTableSearch" />
                     </div>
                 </div>
-
+                
                 <div class="float-right">
-                    <button id="add-existing-user" class="btn btn-secondary" data-user-type="Staff"><i class="fa fa-plus" aria-hidden="true"></i> Add Existing User</button>
-                    <a class="btn btn-secondary" asp-area="Identity" asp-page="/Account/CreateAccount" asp-route-returnController="Staff"><i class="fa fa-user-plus" aria-hidden="true"></i> Create</a>
+                    <button id="add-existing-user" class="btn btn-secondary" data-user-type="Member"><i class="fa fa-plus" aria-hidden="true"></i> Add Existing User</button>
+                    <a class="btn btn-secondary" asp-area="Identity" asp-page="/Account/CreateAccount" asp-route-returnController="Member"><i class="fa fa-user-plus" aria-hidden="true"></i> Create</a>
                 </div>
             </div>
         </div>
@@ -48,7 +47,7 @@
                 </th>
 
                 <th>
-                    
+
                 </th>
             </tr>
         </thead>
@@ -86,13 +85,10 @@
                             <div class="dropdown-menu" aria-labelledby="dropdown-@item.Id">
                                 @if (!item.EmailConfirmed)
                                 {
-                                    <button data-id="@item.Id" data-role="@item.UserRoles" data-user-type="Staff" class="dropdown-item resend-verification"><i class="fa fa-mail-bulk" aria-hidden="true"></i> Resend Verification</button>
+                                    <button data-id="@item.Id" data-role="@item.UserRoles" data-user-type="Member" class="dropdown-item resend-verification"><i class="fa fa-mail-bulk" aria-hidden="true"></i> Resend Verification</button>
                                 }
 
-                                @if (!(item.Id == User.FindFirstValue(ClaimTypes.NameIdentifier)))
-                                {
-                                    <button data-id="@item.Id" data-role="@item.UserRoles" data-user-type="Staff" class="dropdown-item deactivate-account"><i class="fa fa-ban" aria-hidden="true"></i> Deactivate Account</button>
-                                }
+                                <button data-id="@item.Id" data-role="@item.UserRoles" data-user-type="Member" class="dropdown-item deactivate-account"><i class="fa fa-ban" aria-hidden="true"></i> Deactivate Account</button>
                             </div>
                         </div>
                     </td>
@@ -102,20 +98,21 @@
     </table>
 
     <div class="alert alert-info" id="no-results" style="display: none;">
-        No staff members found. Please adjust your search criteria.
+        No members found. Please adjust your search criteria.
     </div>
 }
 else
 {
     <div class="alert alert-info" role="alert">
-        There are no staff to display. Please try again after some time.
+        There are no members to display. Please try again after some time.
     </div>
 
     <div class="float-right">
-        <button id="add-existing-user" class="btn btn-secondary" data-user-type="Staff"><i class="fa fa-plus" aria-hidden="true"></i> Add Existing User</button>
-        <a class="btn btn-secondary" asp-area="Identity" asp-page="/Account/CreateAccount" asp-route-returnController="Staff"><i class="fa fa-user-plus" aria-hidden="true"></i> Create</a>
+        <button id="add-existing-user" class="btn btn-secondary" data-user-type="Member"><i class="fa fa-plus" aria-hidden="true"></i> Add Existing User</button>
+        <a class="btn btn-secondary" asp-area="Identity" asp-page="/Account/CreateAccount" asp-route-returnController="Member"><i class="fa fa-user-plus" aria-hidden="true"></i> Create</a>
     </div>
 }
+
 
 <partial name="_FeedbackModal" />
 <partial name="_UserSelectionModal" />

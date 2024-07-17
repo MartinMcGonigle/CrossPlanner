@@ -55,5 +55,27 @@ namespace CrossPlanner.Repository.Repository
                 }
             }
         }
+
+        public IEnumerable<ApplicationUser> GetAffiliateMembers(int affiliateId)
+        {
+            var connection = new SqlConnection(_applicationContext.Database.GetDbConnection().ConnectionString);
+
+            try
+            {
+                connection.Open();
+                var dynamicParameters = new DynamicParameters();
+                dynamicParameters.Add("AffiliateId", affiliateId);
+
+                var data = connection.Query<ApplicationUser>("spSelectAffiliateMembers", dynamicParameters, commandType: CommandType.StoredProcedure);
+                return data;
+            }
+            finally
+            {
+                if (connection.State == ConnectionState.Open)
+                {
+                    connection.Close();
+                }
+            }
+        }
     }
 }
