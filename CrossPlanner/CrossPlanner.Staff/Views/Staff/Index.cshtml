@@ -84,6 +84,8 @@
                             </button>
 
                             <div class="dropdown-menu" aria-labelledby="dropdown-@item.Id">
+                                <a class="dropdown-item" asp-area="Identity" asp-page="/Account/EditAccount" asp-route-applicationUserId="@item.Id" asp-route-returnController="Staff"><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
+
                                 @if (!item.EmailConfirmed)
                                 {
                                     <button data-id="@item.Id" data-role="@item.UserRoles" data-user-type="Staff" class="dropdown-item resend-verification"><i class="fa fa-mail-bulk" aria-hidden="true"></i> Resend Verification</button>

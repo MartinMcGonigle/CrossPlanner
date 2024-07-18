@@ -40,4 +40,6 @@
     Object.values(inputs).forEach(input => {
         input.addEventListener('input', validateForm);
     });
+
+    validateForm();
 });

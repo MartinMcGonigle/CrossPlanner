@@ -49,8 +49,6 @@ namespace CrossPlanner.Staff.Areas.Identity.Pages.Account
 
         public string ReturnController { get; set; }
 
-        public IList<AuthenticationScheme> ExternalLogins { get; set; }
-
         public class InputModel
         {
             [MaxLength(100)]
@@ -84,16 +82,13 @@ namespace CrossPlanner.Staff.Areas.Identity.Pages.Account
             ReturnController = returnController;
 
             var roles = _roleManager.Roles.ToList();
-
             ViewData["roles"] = roles;
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null, string returnController = null)
         {
             returnUrl ??= Url.Content("~/");
             ReturnController = returnController;
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             if (ModelState.IsValid)
             {
