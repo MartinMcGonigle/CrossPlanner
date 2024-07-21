@@ -1,7 +1,10 @@
-﻿using CrossPlanner.Domain.Models;
+﻿using CrossPlanner.Domain.Enums;
+using CrossPlanner.Domain.Models;
 using CrossPlanner.Repository.Wrapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CrossPlanner.Staff.Controllers
 {
@@ -59,6 +62,67 @@ namespace CrossPlanner.Staff.Controllers
                 ModelState.AddModelError("", "Error creating membership plan: Please try again or contact support.");
                 return View(model);
             }
+        }
+
+        [HttpGet]
+        public IActionResult Edit(int membershipPlanId)
+        {
+            var membershipPlan = GetMembershipPlanById(membershipPlanId);
+
+            if (membershipPlan == null)
+            {
+                _logger.LogWarning($"{logPrefix} - Unable to edit membership plan with id {membershipPlanId} was not found.");
+                TempData["ErrorMessage"] = "Membership plan not found.";
+                return RedirectToAction("Index");
+            }
+
+            return View(membershipPlan);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(MembershipPlan model)
+        {
+            var membershipPlan = GetMembershipPlanById(model.MembershipPlanId);
+
+            if (membershipPlan == null)
+            {
+                _logger.LogWarning($"{logPrefix} - Unable to edit membership plan with id {model.MembershipPlanId} was not found.");
+                TempData["ErrorMessage"] = "Membership plan not found.";
+                return RedirectToAction("Index");
+            }
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            try
+            {
+                _logger.LogInformation($"{logPrefix} - Attempting to edit membership plan with id {membershipPlan.MembershipPlanId}");
+
+                membershipPlan.Title = model.Title;
+                membershipPlan.Price = model.Price;
+                membershipPlan.Description = model.Description;
+                membershipPlan.Type = model.Type;
+                membershipPlan.NumberOfClasses = model.NumberOfClasses;
+                membershipPlan.NumberOfMonths = model.NumberOfMonths;
+
+                _repositoryWrapper.MembershipPlanRepository.Update(membershipPlan);
+                _repositoryWrapper.Save();
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{logPrefix} - Error editing membership plan: {ex}");
+                ModelState.AddModelError("", "Error updating membership plan: Please try again or contact support.");
+                return View(model);
+            }
+        }
+
+        private MembershipPlan GetMembershipPlanById(int id)
+        {
+            return _repositoryWrapper.MembershipPlanRepository
+                .FindByCondition(x => x.MembershipPlanId == id)
+                .FirstOrDefault();
         }
     }
 }
