@@ -19,6 +19,8 @@ namespace CrossPlanner.Domain.Context
 
         public DbSet<AffiliateUser> AffiliateUsers { get; set; }
 
+        public DbSet<MembershipPlan> MembershipPlans { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

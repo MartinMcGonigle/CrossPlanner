@@ -13,6 +13,8 @@ namespace CrossPlanner.Repository.Wrapper
 
         IApplicationUserRepository ApplicationUserRepository { get; }
 
+        IMembershipPlanRepository MembershipPlanRepository { get; }
+
         void Save();
 
         Task SaveAsync();

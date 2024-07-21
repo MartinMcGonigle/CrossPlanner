@@ -74,6 +74,21 @@ namespace CrossPlanner.Repository.Wrapper
                 return _applicationUserRepository;
             }
         }
+        
+        private IMembershipPlanRepository _membershipPlanRepository;
+
+        public IMembershipPlanRepository MembershipPlanRepository
+        {
+            get
+            {
+                if (_membershipPlanRepository == null)
+                {
+                    _membershipPlanRepository = new MembershipPlanRepository(_applicationContext);
+                }
+
+                return _membershipPlanRepository;
+            }
+        }
 
         public void Save()
         {

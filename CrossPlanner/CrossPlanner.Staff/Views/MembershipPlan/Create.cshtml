@@ -1,0 +1,74 @@
+﻿@model MembershipPlan
+@{
+    ViewData["Title"] = "Create Membership Plan";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <a asp-action="Index" class="btn btn-sm btn-secondary"><i class="fa fa-chevron-left" aria-hidden="true"></i> Go Back</a>
+    </div>
+</div>
+
+<div class="d-flex justify-content-center align-items-center">
+    <div class="col-md-5">
+        <section>
+
+            <form id="membershipPlan" method="post">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h3>Create membership plan</h3>
+                        <hr />
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Title" id="title" class="form-control" aria-required="true" />
+                            <label asp-for="Title" class="form-label">Title <span class="required">*</span></label>
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Price" id="price" class="form-control" type="number" step="0.00" aria-required="true" />
+                            <label asp-for="Price" class="form-label">Price <span class="required">*</span></label>
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <textarea asp-for="Description" id="description" class="form-control"></textarea>
+                            <label asp-for="Description" class="form-label">Description </label>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <select asp-for="Type" id="membershipType" asp-items="Html.GetEnumSelectList<MembershipType>()" class="form-control" aria-required="true">
+                                <option disabled selected value="">-- Select --</option>
+                            </select>
+                            <label asp-for="Type" class="form-label">Membership Type <span class="required">*</span></label>
+                            <span asp-validation-for="Type" class="text-danger"></span>
+                        </div>
+
+                        <div id="numberOfClassesDiv" class="form-floating mb-3 collapse">
+                            <input asp-for="NumberOfClasses" id="numberOfClasses" class="form-control" type="number" step="1" />
+                            <label asp-for="NumberOfClasses" class="form-label">Number of Classes <span class="required">*</span></label>
+                            <span asp-validation-for="NumberOfClasses" class="text-danger"></span>
+                        </div>
+
+                        <div id="numberOfMonthsDiv" class="form-floating mb-3 collapse">
+                            <input asp-for="NumberOfMonths" id="numberOfMonths" class="form-control" type="number" step="1" />
+                            <label asp-for="NumberOfMonths" class="form-label">Number of Months <span class="required">*</span></label>
+                            <span asp-validation-for="NumberOfMonths" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-1">
+                            <button id="membership-plan-submit" type="submit" class="w-100 btn btn-lg btn-green"><i class="fa fa-file" aria-hidden="true"></i> Create Membership Plan</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/js/membershipPlanFormHandler.js"></script>
+}
