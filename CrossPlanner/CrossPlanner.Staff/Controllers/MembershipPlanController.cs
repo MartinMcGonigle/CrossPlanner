@@ -2,9 +2,7 @@
 using CrossPlanner.Domain.Models;
 using CrossPlanner.Repository.Wrapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CrossPlanner.Staff.Controllers
 {
@@ -115,6 +113,33 @@ namespace CrossPlanner.Staff.Controllers
                 _logger.LogError($"{logPrefix} - Error editing membership plan: {ex}");
                 ModelState.AddModelError("", "Error updating membership plan: Please try again or contact support.");
                 return View(model);
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> ToggleMembershipPlan(int membershipPlanId)
+        {
+            _logger.LogInformation($"{logPrefix} - Attempting to toggle membership plan with id {membershipPlanId}");
+
+            var membershipPlan = GetMembershipPlanById(membershipPlanId);
+            if (membershipPlan == null)
+            {
+                _logger.LogWarning($"{logPrefix} - Unable to toggle membership plan with id {membershipPlanId} as plan could not be found.");
+                return Json(new { message = "Membership plan not found." });
+            }
+
+            try
+            {
+                membershipPlan.IsActive = !membershipPlan.IsActive;
+                _repositoryWrapper.MembershipPlanRepository.Update(membershipPlan);
+                await _repositoryWrapper.SaveAsync();
+
+                return Json(new { message = "Membership plan toggled successfully." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{logPrefix} - An error occurred whilst attempting to toggle membership plan with id {membershipPlanId}: {ex}");
+                return Json(new { message = "An error occurred while toggling membership plan." });
             }
         }
 
