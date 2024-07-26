@@ -1,0 +1,61 @@
+﻿@model MembershipSelectionViewModel
+@{
+    ViewData["Title"] = "Select Membership";
+    Layout = "~/Views/Shared/_PurchaseLayout.cshtml";
+}
+
+@if (Model.MembershipPlans.Any())
+{
+    <div class="d-flex justify-content-center align-items-center">
+        <div class="col-md-12">
+            <section>
+                <form asp-action="MembershipSelection" method="post">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h3>@ViewData["HeaderType"]</h3>
+                            <hr />
+                            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+                            <input type="hidden" asp-for="Membership.MembershipId" />
+                            <div class="row row-cols-1 row-cols-md-3 g-3">
+                                @foreach (var plan in Model.MembershipPlans)
+                                {
+                                    <div class="col mb-3">
+                                        <div class="card h-100 shadow-sm">
+                                            <div class="card-body">
+                                                <h5 class="card-title">@plan.Title</h5>
+                                                <h6 class="card-subtitle mb-2 text-secondary">Price: @(string.Format("{0:N2}", plan.Price))</h6>
+                                                <p class="card-text">@plan.Description</p>
+                                            </div>
+                                            <div class="card-footer">
+                                                <button type="submit" name="Membership.MembershipPlanId" value="@plan.MembershipPlanId" class="w-100 btn btn-green"><i class="fas fa-hand-pointer" aria-hidden="true"></i> Choose Plan</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-info" role="alert">
+        There are no membership plans available.
+    </div>
+}
+
+@section Progress {
+    @{
+        await Html.RenderPartialAsync("_Progress");
+    }
+}
+
+@section Menu {
+    @{
+        await Html.RenderPartialAsync("_Menu");
+    }
+}

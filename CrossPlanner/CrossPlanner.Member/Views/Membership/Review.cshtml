@@ -1,0 +1,138 @@
+﻿@using CrossPlanner.Domain.Enums
+@model Membership
+@{
+    ViewData["Title"] = "Review";
+    Layout = "~/Views/Shared/_PurchaseLayout.cshtml";
+}
+
+<div class="d-flex justify-content-center align-items-center">
+    <div class="col-md-12">
+        <section>
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h3>@ViewData["HeaderType"]</h3>
+                    <hr />
+
+                    <div class="mb-3">
+                        <table class="table table-hover">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <p><b>Membership:</b></p>
+                                    </td>
+
+                                    <td>
+                                        <p>@Model.MembershipPlan.Title</p>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <p><b>Price:</b></p>
+                                    </td>
+
+                                    <td>
+                                        <p>@string.Format("{0:N2}", Model.MembershipPlan.Price)</p>
+                                    </td>
+                                </tr>
+
+                                @if (Model.MembershipPlan.Type == (int)MembershipType.Weekly)
+                                {
+                                    <tr>
+                                        <td>
+                                            <p><b>Number of Classes Per Week:</b></p>
+                                        </td>
+
+                                        <td>
+                                            <p>@Model.MembershipPlan.NumberOfClasses</p>
+                                        </td>
+                                    </tr>
+                                }
+                                else if (Model.MembershipPlan.Type == (int)MembershipType.Monthly)
+                                {
+                                   <tr>
+                                        <td>
+                                            <p><b>Number of Classes:</b></p>
+                                        </td>
+
+                                        <td>
+                                            <p>@Model.MembershipPlan.NumberOfClasses</p>
+                                        </td>
+                                   </tr>
+
+                                    <tr>
+                                        <td>
+                                            <p><b>Number of Months:</b></p>
+                                        </td>
+
+                                        <td>
+                                            <p>@Model.MembershipPlan.NumberOfMonths</p>
+                                        </td>
+                                    </tr>
+                                }
+                                else if (Model.MembershipPlan.Type == (int)MembershipType.Unlimited)
+                                {
+                                    <tr>
+                                        <td>
+                                            <p><b>Number of Classes:</b></p>
+                                        </td>
+
+                                        <td>
+                                            Unlimited
+                                        </td>
+                                    </tr>
+                                }
+
+                                <tr>
+                                    <td>
+                                        <p><b>Start Date:</b></p>
+                                    </td>
+
+                                    <td>
+                                        <p>@Model.StartDate.ToShortDateString()</p>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <p><b>End Date:</b></p>
+                                    </td>
+
+                                    <td>
+                                        <p>@Model.EndDate?.ToShortDateString()</p>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <p><b>Auto Renew:</b></p>
+                                    </td>
+
+                                    <td>
+                                        <p>@(Model.AutoRenew == true ? "Yes" : "No") </p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mb-1">
+                        <a asp-action="PaymentDetails" asp-route-membershipId="@Model.MembershipId" class="w-100 btn btn-green"><i class="fa fa-credit-card" aria-hidden="true"></i> Advance to payment</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+@section Progress {
+    @{
+        await Html.RenderPartialAsync("_Progress");
+    }
+}
+
+@section Menu {
+    @{
+        await Html.RenderPartialAsync("_Menu");
+    }
+}

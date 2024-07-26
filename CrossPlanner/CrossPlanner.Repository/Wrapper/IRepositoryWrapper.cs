@@ -15,6 +15,8 @@ namespace CrossPlanner.Repository.Wrapper
 
         IMembershipPlanRepository MembershipPlanRepository { get; }
 
+        IMembershipRepository MembershipRepository { get; }
+
         void Save();
 
         Task SaveAsync();

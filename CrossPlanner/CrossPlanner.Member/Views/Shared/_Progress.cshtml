@@ -1,0 +1,22 @@
+﻿@{
+    var steps = ViewData["Steps"] as LinkedList<StepViewModel>;
+    decimal totalSteps = steps.Count;
+    int stepNumber = (int)ViewData["CurrentStepNumber"];
+    var stepPercent = Math.Round((stepNumber / totalSteps) * 100);
+}
+
+@functions {
+    static string WritePercentageWidth(decimal percent)
+    {
+        return $"width: {percent}%";
+    }
+}
+
+<div class="progress-wrapper">
+    <span id="menustep">Step @stepNumber of @totalSteps steps</span>
+    <div class="progress mb-3">
+        <div class="progress-bar" role="progressbar" style="@WritePercentageWidth(stepPercent)" aria-valuenow="@stepPercent" aria-valuemin="0" aria-valuemax="100">
+            @stepPercent% Complete
+        </div>
+    </div>
+</div>

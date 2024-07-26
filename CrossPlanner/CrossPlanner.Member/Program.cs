@@ -1,13 +1,16 @@
 using CrossPlanner.Domain.Context;
 using CrossPlanner.Domain.Models;
+using CrossPlanner.Domain.OtherModels;
 using CrossPlanner.Repository.Wrapper;
 using CrossPlanner.Service.Authorisation;
 using CrossPlanner.Service.CustomTokenProviders;
 using CrossPlanner.Service.Messages;
+using CrossPlanner.Service.Stripe;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,6 +67,9 @@ builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, MyUserC
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+builder.Services.AddSingleton<IStripeService, StripeService>();
+
 
 builder.Services.AddDataProtection()
     .SetApplicationName("CrossPlanner")

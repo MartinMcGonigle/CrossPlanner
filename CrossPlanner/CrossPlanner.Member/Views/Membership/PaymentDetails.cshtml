@@ -1,0 +1,47 @@
+﻿@{
+    ViewData["Title"] = "Review";
+    Layout = "~/Views/Shared/_PurchaseLayout.cshtml";
+}
+
+<div class="d-flex justify-content-center align-items-center">
+    <div class="col-md-12">
+        <section>
+            <form asp-action="PaymentDetails" method="post" id="payment-form">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h3>@ViewData["HeaderType"]</h3>
+                        <hr />
+
+                        <div id="card-errors" class="text-danger" role="alert"></div>
+                        <input type="hidden" name="membershipId" value="@ViewData["MembershipId"]" />
+                        <div class="mb-3">
+                            <div id="card-element">
+                            </div>
+                        </div>
+
+                        <div class="mb-1">
+                            <button type="submit" class="w-100 btn btn-green"><i class="fa fa-credit-card" aria-hidden="true"></i> Submit Payment</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+
+@section Progress {
+    @{
+        await Html.RenderPartialAsync("_Progress");
+    }
+}
+
+@section Menu {
+    @{
+        await Html.RenderPartialAsync("_Menu");
+    }
+}
+
+@section Scripts {
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="~/js/stripe.js"></script>
+}

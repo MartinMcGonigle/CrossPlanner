@@ -1,0 +1,45 @@
+﻿@{
+    var steps = ViewData["Steps"] as LinkedList<StepViewModel>;
+    int stepNumber = 0;
+    var isDisabled = false;
+    var currentStep = (StepViewModel)ViewData["CurrentStep"];
+}
+
+<div class="list-group">
+    @if (steps != null)
+    {
+        foreach (var step in steps)
+        {
+            stepNumber++;
+
+            var isActive = currentStep.Equals(step);
+
+            var activeClass = isActive ? " active" : string.Empty;
+            var disabledClass = isDisabled ? " disabled" : string.Empty;
+            string linkClass = $"list-group-item list-group-item-action{activeClass}{disabledClass}";
+
+            if (!isDisabled)
+            {
+                if (isActive)
+                {
+                    <a class="@linkClass" asp-action="@step.Name" asp-route-membershipId="@ViewData["MembershipId"]">
+                        @($"{stepNumber}. {step.Title}")
+                    </a>
+
+                    isDisabled = true;
+                }
+                else
+                {
+                    <a class="@linkClass" asp-action="@step.Name" asp-route-membershipId="@ViewData["MembershipId"]">
+                        <i class="fas fa-fw fa-check" aria-hidden="true"></i>
+                        <span>@($"{stepNumber}. {step.Title}")</span>
+                    </a>
+                }
+            }
+            else
+            {
+                <span class="@linkClass">@($"{stepNumber}. {step.Title}")</span>
+            }
+        }
+    }
+</div>

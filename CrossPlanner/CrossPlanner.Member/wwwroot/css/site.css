@@ -129,6 +129,11 @@ h3 {
 }
 
 
+.progress-wrapper .step-labels span {
+    flex: 1;
+    text-align: center;
+}
+
 
 
 

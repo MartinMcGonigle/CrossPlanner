@@ -1,5 +1,4 @@
-﻿using CrossPlanner.Domain.Enums;
-using CrossPlanner.Domain.Models;
+﻿using CrossPlanner.Domain.Models;
 using CrossPlanner.Repository.Wrapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

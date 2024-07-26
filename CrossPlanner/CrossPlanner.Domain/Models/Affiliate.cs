@@ -30,5 +30,7 @@ namespace CrossPlanner.Domain.Models
         public string Email { get; set; }
 
         public bool IsActive { get; set; } = true;
+
+        public string? ConnectedAccountId { get; set; }
     }
 }
