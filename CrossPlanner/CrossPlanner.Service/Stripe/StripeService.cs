@@ -19,9 +19,8 @@ namespace CrossPlanner.Service.Stripe
                 StripeAccount = connectedAccountId
             };
 
-            StripeList<Customer> customers = await customerService.ListAsync(listOptions, requestOptions);
+            var customers = await customerService.ListAsync(listOptions, requestOptions);
 
-            // Check if we have any customers with that email
             if (customers != null && customers.Data.Count > 0)
             {
                 return customers.Data.First();
@@ -34,7 +33,7 @@ namespace CrossPlanner.Service.Stripe
                     Source = sourceToken
                 };
 
-                Customer newCustomer = await customerService.CreateAsync(customerOptions, requestOptions);
+                var newCustomer = await customerService.CreateAsync(customerOptions, requestOptions);
 
                 return newCustomer;
             }

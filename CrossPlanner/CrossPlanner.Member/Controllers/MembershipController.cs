@@ -12,7 +12,7 @@ using System.Security.Claims;
 
 namespace CrossPlanner.Member.Controllers
 {
-    [Authorize(Roles = "SuperUser")]
+    [Authorize(Roles = "Member")]
     public class MembershipController : BaseController
     {
         private readonly ILogger<MembershipController> _logger;
@@ -39,7 +39,7 @@ namespace CrossPlanner.Member.Controllers
             Steps.AddLast(new StepViewModel { Name = nameof(MembershipDetails), Title = "Membership Details" });
             Steps.AddLast(new StepViewModel { Name = nameof(Review), Title = "Review" });
             Steps.AddLast(new StepViewModel { Name = nameof(PaymentDetails), Title = "Payment Details" });
-            Steps.AddLast(new StepViewModel { Name = nameof(Finish), Title = "Finish", IncludeInReview = false });
+            Steps.AddLast(new StepViewModel { Name = nameof(Finish), Title = "Finish" });
         }
 
         [HttpGet("membership-selection")]
@@ -233,26 +233,29 @@ namespace CrossPlanner.Member.Controllers
         {
             try
             {
-                var membership = GetMembershipByMembershipIdAndMemberId(membershipId);
+                var membership = _repositoryWrapper.MembershipRepository
+                    .FindByCondition(m => m.MembershipId == membershipId && m.MemberId == _userId)
+                    .Include("MembershipPlan")
+                    .FirstOrDefault();
 
                 if (membership == null)
                 {
-                    _logger.LogInformation($"{logPrefix} - Could not find membership with id {membershipId} for user with id: {_userId}");
+                    _logger.LogError($"{logPrefix} - Could not find membership with id {membershipId} for user with id: {_userId}");
                     return View("Error");
                 }
 
-                // Setup Stripe configuration
                 StripeConfiguration.ApiKey = _stripeSettings.Value.SecretKey;
 
                 Int32.TryParse(User.FindFirst("Affiliate")?.Value, out int affiliateId);
                 var affiliate = GetAffiliateById(affiliateId);
-                string connectedAccountId = affiliate.ConnectedAccountId;
+                var connectedAccountId = affiliate.ConnectedAccountId;
 
-                Customer customer = await _stripeService.GetOrCreateCustomer(User.FindFirst(ClaimTypes.Email)?.Value, stripeToken, connectedAccountId);
-
+                var customer = await _stripeService.GetOrCreateCustomer(User.FindFirst(ClaimTypes.Email)?.Value, stripeToken, connectedAccountId);
+                var amountInPence = (long)(membership.MembershipPlan.Price * 100);  // Convert pounds to pence
+                
                 var chargeOptions = new ChargeCreateOptions
                 {
-                    Amount = 500,
+                    Amount = amountInPence,
                     Currency = "gbp",
                     Description = "Membership Fee",
                     Customer = customer.Id,
@@ -264,7 +267,7 @@ namespace CrossPlanner.Member.Controllers
                 };
 
                 var service = new ChargeService();
-                Charge charge = await service.CreateAsync(chargeOptions, requestOptions);
+                var charge = await service.CreateAsync(chargeOptions, requestOptions);
 
                 if (charge.Paid)
                 {
@@ -275,10 +278,15 @@ namespace CrossPlanner.Member.Controllers
                     _repositoryWrapper.MembershipRepository.Update(membership);
                     _repositoryWrapper.Save();
 
+                    StoreStripeCustomerId(customer.Id, affiliateId);
+
                     return RedirectToAction(NextStep.Name);
                 }
                 else
                 {
+                    _logger.LogError("Payment failed for user {UserId} with membership ID {MembershipId}. Stripe Charge ID: {ChargeId}", _userId, membershipId, charge.Id);
+                    TempData["ErrorMessage"] = "We couldn't process your payment. Please check your card details and try again. If the problem persists, contact our support team.";
+
                     ViewData["HeaderType"] = "Payment Details";
                     ViewData["MembershipId"] = membershipId;
 
@@ -339,6 +347,28 @@ namespace CrossPlanner.Member.Controllers
             return _repositoryWrapper.AffiliateRepository
                 .FindByCondition(a => a.AffiliateId == affiliateId)
                 .FirstOrDefault();
+        }
+
+        private void StoreStripeCustomerId(string stripeCustomerId, int affiliateId)
+        {
+            var userStripeAffiliate = _repositoryWrapper.UserStripeAffiliateRepository
+                .FindByCondition(usa => usa.StripeCustomerId == stripeCustomerId
+                && usa.ApplicationUserId == _userId
+                && usa.AffiliateId == affiliateId)
+                .FirstOrDefault();
+
+            if (userStripeAffiliate != null)
+                return;
+
+            var newUserStripeAffiliate = new UserStripeAffiliate
+            {
+                StripeCustomerId = stripeCustomerId,
+                ApplicationUserId = _userId,
+                AffiliateId = affiliateId
+            };
+
+            _repositoryWrapper.UserStripeAffiliateRepository.Create(newUserStripeAffiliate);
+            _repositoryWrapper.Save();
         }
     }
 }

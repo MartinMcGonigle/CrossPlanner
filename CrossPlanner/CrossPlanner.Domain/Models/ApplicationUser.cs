@@ -24,7 +24,5 @@ namespace CrossPlanner.Domain.Models
 
         [NotMapped]
         public string UserRoles { get; set; }
-
-        public string? StripeCustomerId { get; set; }
     }
 }

@@ -20,14 +20,30 @@
                             <label asp-for="AutoRenew" class="form-label">Auto-renew Membership? <span class="required">*</span></label>
 
                             <div class="form-check">
-                                <input asp-for="AutoRenew" class="form-check-input" type="radio" value="true" id="autoRenewYes" />
+                                @if (Model.AutoRenew)
+                                {
+                                    <input asp-for="AutoRenew" class="form-check-input" type="radio" value="true" id="autoRenewYes" checked />
+                                }
+                                else
+                                {
+                                    <input asp-for="AutoRenew" class="form-check-input" type="radio" value="true" id="autoRenewYes" />
+                                }
+                                
                                 <label class="form-check-label" for="autoRenewYes">
                                     Yes, auto-renew
                                 </label>
                             </div>
 
                             <div class="form-check">
-                                <input asp-for="AutoRenew" class="form-check-input" type="radio" value="false" id="autoRenewNo" />
+                                @if (!Model.AutoRenew)
+                                {
+                                    <input asp-for="AutoRenew" class="form-check-input" type="radio" value="false" id="autoRenewNo" checked />
+                                }
+                                else
+                                {
+                                    <input asp-for="AutoRenew" class="form-check-input" type="radio" value="false" id="autoRenewNo" />
+                                }
+                                
                                 <label class="form-check-label" for="autoRenewNo">
                                     No, do not auto-renew
                                 </label>

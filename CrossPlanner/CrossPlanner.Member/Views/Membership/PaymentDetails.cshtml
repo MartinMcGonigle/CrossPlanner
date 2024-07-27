@@ -3,6 +3,14 @@
     Layout = "~/Views/Shared/_PurchaseLayout.cshtml";
 }
 
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        @TempData["ErrorMessage"]
+    </div>
+}
+
 <div class="d-flex justify-content-center align-items-center">
     <div class="col-md-12">
         <section>
@@ -11,9 +19,10 @@
                     <div class="card-body">
                         <h3>@ViewData["HeaderType"]</h3>
                         <hr />
-
                         <div id="card-errors" class="text-danger" role="alert"></div>
+                        
                         <input type="hidden" name="membershipId" value="@ViewData["MembershipId"]" />
+                        
                         <div class="mb-3">
                             <div id="card-element">
                             </div>

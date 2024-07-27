@@ -105,6 +105,21 @@ namespace CrossPlanner.Repository.Wrapper
             }
         }
 
+        private IUserStripeAffiliateRepository _userStripeAffiliateRepository;
+
+        public IUserStripeAffiliateRepository UserStripeAffiliateRepository
+        {
+            get
+            {
+                if (_userStripeAffiliateRepository == null)
+                {
+                    _userStripeAffiliateRepository = new UserStripeAffiliateRepository(_applicationContext);
+                }
+
+                return _userStripeAffiliateRepository;
+            }
+        }
+
         public void Save()
         {
             _applicationContext.SaveChanges();

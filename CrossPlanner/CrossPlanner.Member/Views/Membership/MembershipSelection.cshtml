@@ -17,6 +17,8 @@
                             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
                             <input type="hidden" asp-for="Membership.MembershipId" />
+                            <input type="hidden" asp-for="Membership.AutoRenew" />
+
                             <div class="row row-cols-1 row-cols-md-3 g-3">
                                 @foreach (var plan in Model.MembershipPlans)
                                 {
