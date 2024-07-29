@@ -1,0 +1,74 @@
+﻿@{
+    var currentPage = ViewData["Page"] == null ? 1 : int.Parse(ViewData["Page"].ToString());
+    var pageSize = 0;
+    var totalNumberOfPages = 0;
+    var recordCount = 0;
+    var startRecord = 0;
+    var endRecord = 0;
+    var showMoreLeft = false;
+    var showMoreRight = false;
+    var start = 0;
+    var end = 0;
+    var action = ViewData["Action"];
+
+    if (ViewData["PageSize"] != null && ViewData["RecordCount"] != null)
+    {
+        pageSize = int.Parse(ViewData["PageSize"].ToString());
+        recordCount = int.Parse(ViewData["RecordCount"].ToString());
+        const int maxPagesToBeShown = 5;
+        totalNumberOfPages = (int)Math.Ceiling((decimal)recordCount / pageSize);
+
+        // Logic to decide which pages to be shown
+        start = totalNumberOfPages <= maxPagesToBeShown ? 1 : currentPage;
+        end = totalNumberOfPages <= maxPagesToBeShown ? totalNumberOfPages : Math.Min(start + maxPagesToBeShown - 1, totalNumberOfPages);
+
+        // Always show the max pages if allowed
+        start = Math.Max(end - (maxPagesToBeShown - 1), 1);
+
+        showMoreLeft = start > 1;
+        showMoreRight = end < totalNumberOfPages;
+
+        startRecord = ((currentPage - 1) * pageSize) + 1;
+        endRecord = Math.Min(startRecord + pageSize - 1, (int)recordCount);
+    }
+}
+
+@if (totalNumberOfPages > 0)
+{
+    <nav aria-label="Table navigation">
+        <span class="navbar-text float-left">
+            Record @startRecord to @endRecord of @recordCount
+        </span>
+
+        <ul class="pagination justify-content-end">
+            <li class="page-item@(currentPage == 1 ? " disabled" : "")">
+                <a class="page-link" asp-action="@action" asp-route-page="@(currentPage - 1)" asp-route-pageSize="@pageSize">Previous</a>
+            </li>
+
+            @if (showMoreLeft)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="@action" asp-route-page="@(currentPage - 1)" asp-route-pageSize="@pageSize">...</a>
+                </li>
+            }
+            
+            @for (int i = start; i <= end; i++)
+            {
+                <li class="page-item@(i == currentPage ? " active" : "")">
+                    <a class="page-link" asp-action="@action" asp-route-page="@i" asp-route-pageSize="@pageSize">@i</a>
+                </li>
+            }
+
+            @if (showMoreRight)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="@action" asp-route-page="@(currentPage + 1)" asp-route-pageSize="@pageSize">...</a>
+                </li>
+            }
+
+            <li class="page-item@(currentPage == totalNumberOfPages ? " disabled" : "")">
+                <a class="page-link" asp-action="@action" asp-route-page="@(currentPage + 1)" asp-route-pageSize="@pageSize">Next</a>
+            </li>
+        </ul>
+    </nav>
+}
