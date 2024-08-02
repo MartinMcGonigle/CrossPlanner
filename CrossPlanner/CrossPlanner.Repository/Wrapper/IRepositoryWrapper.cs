@@ -19,6 +19,8 @@ namespace CrossPlanner.Repository.Wrapper
 
         IUserStripeAffiliateRepository UserStripeAffiliateRepository { get; }
 
+        IRefundRepository RefundRepository { get; }
+
         void Save();
 
         Task SaveAsync();

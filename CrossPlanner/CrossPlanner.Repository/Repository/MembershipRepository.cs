@@ -1,4 +1,5 @@
 ﻿using CrossPlanner.Domain.Context;
+using CrossPlanner.Domain.Enums;
 using CrossPlanner.Domain.Models;
 using CrossPlanner.Domain.OtherModels;
 using CrossPlanner.Repository.Interfaces;
@@ -72,6 +73,18 @@ namespace CrossPlanner.Repository.Repository
                     connection.Close();
                 }
             }
+        }
+
+
+        public IEnumerable<Membership> GetUserMemberships(int affiliateId, string memberId)
+        {
+            return _applicationContext.Memberships
+                .Where(m => m.MemberId == memberId
+                && m.PaymentStatus == PaymentStatus.Paid
+                && m.MembershipPlan.AffiliateId == affiliateId)
+                .Include(m => m.MembershipPlan)
+                .OrderByDescending(m => m.StartDate )
+                .ToList();
         }
     }
 }

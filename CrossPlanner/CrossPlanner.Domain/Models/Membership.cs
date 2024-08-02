@@ -24,6 +24,8 @@ namespace CrossPlanner.Domain.Models
 
         public string? LastPaymentId { get; set; }
 
+        public decimal LastPaymentAmount { get; set; }
+
         public PaymentStatus? PaymentStatus { get; set; }
 
         [ForeignKey("MemberId")]

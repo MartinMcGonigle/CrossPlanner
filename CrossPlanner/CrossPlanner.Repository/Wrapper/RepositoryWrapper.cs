@@ -120,6 +120,21 @@ namespace CrossPlanner.Repository.Wrapper
             }
         }
 
+        private IRefundRepository _refundRepository;
+
+        public IRefundRepository RefundRepository
+        {
+            get
+            {
+                if (_refundRepository == null)
+                {
+                    _refundRepository = new RefundRepository(_applicationContext);
+                }
+
+                return _refundRepository;
+            }
+        }
+
         public void Save()
         {
             _applicationContext.SaveChanges();

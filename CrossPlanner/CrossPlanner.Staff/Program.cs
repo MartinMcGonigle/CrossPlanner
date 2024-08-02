@@ -1,13 +1,16 @@
 using CrossPlanner.Domain.Context;
 using CrossPlanner.Domain.Models;
+using CrossPlanner.Domain.OtherModels;
 using CrossPlanner.Repository.Wrapper;
 using CrossPlanner.Service.Authorisation;
 using CrossPlanner.Service.CustomTokenProviders;
 using CrossPlanner.Service.Messages;
+using CrossPlanner.Service.Stripe;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -70,6 +73,9 @@ builder.Services.AddDataProtection()
     .SetApplicationName("CrossPlanner")
     .PersistKeysToFileSystem(new DirectoryInfo(@"C:\logs\Keys"))
     .ProtectKeysWithCertificate(builder.Configuration.GetSection("Cert").Value);
+
+builder.Services.AddScoped<IStripeService, StripeService>();
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
 var app = builder.Build();
 

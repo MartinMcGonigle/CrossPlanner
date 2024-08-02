@@ -16,8 +16,7 @@ namespace CrossPlanner.Domain.Models
 
         [Required]
         [Display(Name = "Price")]
-        [Range(minimum: 0.0, maximum: double.MaxValue, ErrorMessage = "Price must be at least 0.0")]
-        public double Price { get; set; }
+        public decimal Price { get; set; }
 
         [MaxLength(250)]
         [Display(Name = "Description")]

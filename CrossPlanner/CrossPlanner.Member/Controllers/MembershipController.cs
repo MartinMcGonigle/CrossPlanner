@@ -244,36 +244,18 @@ namespace CrossPlanner.Member.Controllers
                     return View("Error");
                 }
 
-                StripeConfiguration.ApiKey = _stripeSettings.Value.SecretKey;
-
                 Int32.TryParse(User.FindFirst("Affiliate")?.Value, out int affiliateId);
                 var affiliate = GetAffiliateById(affiliateId);
-                var connectedAccountId = affiliate.ConnectedAccountId;
 
-                var customer = await _stripeService.GetOrCreateCustomer(User.FindFirst(ClaimTypes.Email)?.Value, stripeToken, connectedAccountId);
-                var amountInPence = (long)(membership.MembershipPlan.Price * 100);  // Convert pounds to pence
-                
-                var chargeOptions = new ChargeCreateOptions
-                {
-                    Amount = amountInPence,
-                    Currency = "gbp",
-                    Description = "Membership Fee",
-                    Customer = customer.Id,
-                };
+                var customer = await _stripeService.GetOrCreateCustomer(User.FindFirst(ClaimTypes.Email)?.Value, stripeToken, affiliate.ConnectedAccountId);
+                var processPayment = await _stripeService.ProcessPayment(membership.MembershipPlan.Price, customer.Id, affiliate.ConnectedAccountId);
 
-                var requestOptions = new RequestOptions
-                {
-                    StripeAccount = connectedAccountId
-                };
-
-                var service = new ChargeService();
-                var charge = await service.CreateAsync(chargeOptions, requestOptions);
-
-                if (charge.Paid)
+                if (processPayment.Success)
                 {
                     membership.IsActive = true;
-                    membership.LastPaymentId = charge.Id;
-                    membership.PaymentStatus = PaymentStatus.Completed;
+                    membership.LastPaymentId = processPayment.PaymentId;
+                    membership.PaymentStatus = PaymentStatus.Paid;
+                    membership.LastPaymentAmount = membership.MembershipPlan.Price;
 
                     _repositoryWrapper.MembershipRepository.Update(membership);
                     _repositoryWrapper.Save();
@@ -284,7 +266,7 @@ namespace CrossPlanner.Member.Controllers
                 }
                 else
                 {
-                    _logger.LogError("Payment failed for user {UserId} with membership ID {MembershipId}. Stripe Charge ID: {ChargeId}", _userId, membershipId, charge.Id);
+                    _logger.LogError("Payment failed for user {UserId} with membership ID {MembershipId}. Stripe Charge ID: {ChargeId}", _userId, membershipId, processPayment.PaymentId);
                     TempData["ErrorMessage"] = "We couldn't process your payment. Please check your card details and try again. If the problem persists, contact our support team.";
 
                     ViewData["HeaderType"] = "Payment Details";

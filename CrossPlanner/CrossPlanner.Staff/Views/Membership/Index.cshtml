@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<MembershipViewModel>
 @{
-    ViewData["Memberships"] = "Memberships";
+    ViewData["Title"] = "Memberships";
     var pageSize = 0;
 
     if (ViewData["PageSize"] != null && ViewData["RecordCount"] != null)
@@ -80,7 +80,7 @@
                             </button>
 
                             <div class="dropdown-menu" aria-labelledby="dropdown-@item.MemberId">
-
+                                <a class="dropdown-item" asp-action="ManageMembership" asp-route-memberId="@item.MemberId"><i class="fas fa-cog" aria-hidden="true"></i> Manage Membership</a>
                             </div>
                         </div>
                     </td>

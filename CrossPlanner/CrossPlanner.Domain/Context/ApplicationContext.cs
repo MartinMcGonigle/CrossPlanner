@@ -1,4 +1,4 @@
-﻿using CrossPlanner.Domain.Models;
+﻿                                         using CrossPlanner.Domain.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,6 +24,8 @@ namespace CrossPlanner.Domain.Context
         public DbSet<Membership> Memberships { get; set; }
 
         public DbSet<UserStripeAffiliate> UserStripeAffiliates { get; set; }
+        
+        public DbSet<Refund> Refunds { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
