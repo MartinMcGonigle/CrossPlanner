@@ -15,7 +15,7 @@ namespace CrossPlanner.Repository.Repository
             
         }
 
-        public IEnumerable<MembershipPlan> GetAffiliateMembershipPlans(int affiliateId)
+        public IEnumerable<MembershipPlan> GetAffiliateMembershipPlans(int affiliateId, string q, int page, int pageSize, string statusSearch, string typeSearch)
         {
             var connection = new SqlConnection(_applicationContext.Database.GetDbConnection().ConnectionString);
 
@@ -23,9 +23,39 @@ namespace CrossPlanner.Repository.Repository
             {
                 connection.Open();
                 var dynamicParameters = new DynamicParameters();
-                dynamicParameters.Add("AffiliateId", affiliateId);
-                
+                dynamicParameters.Add("affiliateId", affiliateId);
+                dynamicParameters.Add("search", q ?? "");
+                dynamicParameters.Add("page", page);
+                dynamicParameters.Add("pageSize", pageSize);
+                dynamicParameters.Add("statusSearch", statusSearch);
+                dynamicParameters.Add("typeSearch", typeSearch);
+
                 var data = connection.Query<MembershipPlan>("spSelectAffiliateMembershipPlans", dynamicParameters, commandType: CommandType.StoredProcedure);
+                return data;
+            }
+            finally
+            {
+                if (connection.State == ConnectionState.Open)
+                {
+                    connection.Close();
+                }
+            }
+        }
+
+        public int GetAffiliateMembershipPlansCount(int affiliateId, string q, string statusSearch, string typeSearch)
+        {
+            var connection = new SqlConnection(_applicationContext.Database.GetDbConnection().ConnectionString);
+
+            try
+            {
+                connection.Open();
+                var dynamicParameters = new DynamicParameters();
+                dynamicParameters.Add("affiliateId", affiliateId);
+                dynamicParameters.Add("search", q ?? "");
+                dynamicParameters.Add("statusSearch", statusSearch);
+                dynamicParameters.Add("typeSearch", typeSearch);
+
+                var data = connection.QuerySingle<int>("spSelectAffiliateMembershipPlansCount", dynamicParameters, commandType: CommandType.StoredProcedure);
                 return data;
             }
             finally

@@ -1,7 +1,11 @@
 ﻿@model MembershipSelectionViewModel
 @{
     ViewData["Title"] = "Select Membership";
-    Layout = "~/Views/Shared/_PurchaseLayout.cshtml";
+
+    @if (Model.MembershipPlans.Any())
+    {
+        Layout = "~/Views/Shared/_PurchaseLayout.cshtml";
+    }
 }
 
 @if (Model.MembershipPlans.Any())
@@ -42,22 +46,23 @@
             </section>
         </div>
     </div>
+
+    @section Progress {
+    @{
+            await Html.RenderPartialAsync("_Progress");
+        }
+    }
+
+    @section Menu {
+    @{
+            await Html.RenderPartialAsync("_Menu");
+        }
+    }
 }
 else
 {
-    <div class="alert alert-info" role="alert">
-        There are no membership plans available.
+    <div class="alert alert-info mt-4 text-center">
+        <h4 class="alert-heading">No Memberships Available</h4>
+        <p>Currently, there are no memberships to display. Please try again later or reach out to a staff member if the issue continues.</p>
     </div>
-}
-
-@section Progress {
-    @{
-        await Html.RenderPartialAsync("_Progress");
-    }
-}
-
-@section Menu {
-    @{
-        await Html.RenderPartialAsync("_Menu");
-    }
 }

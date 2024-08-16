@@ -33,5 +33,7 @@ namespace CrossPlanner.Domain.Models
 
         [ForeignKey("MembershipPlanId")]
         public MembershipPlan MembershipPlan { get; set; }
+
+        public ICollection<Refund> Refunds { get; set; } = new List<Refund>();
     }
 }

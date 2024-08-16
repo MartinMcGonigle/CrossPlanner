@@ -35,4 +35,34 @@
                 })
         });
     });
+
+    const statusSearch = document.getElementById('statusSearch');
+    const typeSearch = document.getElementById('typeSearch');
+    const q = document.getElementById('q');
+    const filterForm = document.getElementById('filterForm');
+    const clearFilters = document.getElementById('clear-filters');
+
+    const filterChange = () => {
+        if (statusSearch.value != '0' ||
+            typeSearch.value != '0' ||
+            q.value != '') {
+            clearFilters.classList.remove('collapse');
+        } else {
+            clearFilters.classList.add('collapse');
+        }
+    };
+
+    const clearAllFilters = () => {
+        statusSearch.value = '0';
+        typeSearch.value = '0';
+        q.value = '';
+        filterForm.submit();
+    };
+
+    statusSearch.addEventListener('change', filterChange);
+    typeSearch.addEventListener('change', filterChange);
+    q.addEventListener('input', filterChange);
+    clearFilters.addEventListener('click', clearAllFilters);
+
+    filterChange();
 });

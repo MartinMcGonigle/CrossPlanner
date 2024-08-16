@@ -79,10 +79,14 @@ namespace CrossPlanner.Repository.Repository
         public IEnumerable<Membership> GetUserMemberships(int affiliateId, string memberId)
         {
             return _applicationContext.Memberships
-                .Where(m => m.MemberId == memberId
-                && m.PaymentStatus == PaymentStatus.Paid
-                && m.MembershipPlan.AffiliateId == affiliateId)
+                .Where(
+                m => m.MemberId == memberId
+                && m.MembershipPlan.AffiliateId == affiliateId
+                && (m.PaymentStatus == PaymentStatus.Paid || m.PaymentStatus == PaymentStatus.Refunded)
+                )
                 .Include(m => m.MembershipPlan)
+                .Include(m => m.Member)
+                .Include(m => m.Refunds)
                 .OrderByDescending(m => m.StartDate )
                 .ToList();
         }

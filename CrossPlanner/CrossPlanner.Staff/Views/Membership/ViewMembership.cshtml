@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<Membership>
 @{
-    ViewData["Title"] = "Manage Membership";
+    ViewData["Title"] = "Memberships";
 }
 
 @if (Model.Count() > 0)
@@ -17,7 +17,7 @@
                 </th>
 
                 <th>
-                    StartDate
+                    Start Date
                 </th>
 
                 <th>
@@ -25,11 +25,15 @@
                 </th>
 
                 <th>
-                    Status
+                    Payment Status
                 </th>
 
                 <th>
-                    IsActive
+                    Is Active
+                </th>
+
+                <th>
+                    Payment Amount
                 </th>
 
                 <th>
@@ -50,11 +54,11 @@
                     </td>
 
                     <td>
-                        @membership.StartDate.ToShortDateString()
+                        @($"{membership.StartDate.ToShortDateString()} {membership.StartDate.ToShortTimeString()}")
                     </td>
 
                     <td>
-                        @membership.EndDate?.ToShortDateString()
+                        @($"{membership.EndDate?.ToShortDateString()} {membership.EndDate?.ToShortTimeString()}")
                     </td>
 
                     <td>
@@ -66,9 +70,13 @@
                     </td>
 
                     <td>
+                        @(string.Format("{0:N2}", membership.LastPaymentAmount))
+                    </td>
+
+                    <td>
                         @if (membership.IsActive)
                         {
-                            <button data-membershipid="@membership.MembershipId" class="btn btn-danger deactivate-membership"><i class="fa fa-ban" aria-hidden="true"></i> Deactivate Membership</button>
+                            <button data-membershipid="@membership.MembershipId" class="btn btn-danger cancel-membership"><i class="fa fa-ban" aria-hidden="true"></i> Cancel Membership</button>
                         }
                     </td>
                 </tr>
@@ -86,5 +94,5 @@ else
 <partial name="_FeedbackModal" />
 
 @section Scripts {
-    <script src="~/js/manageMembership.js"></script>
+    <script src="~/js/membership.js"></script>
 }

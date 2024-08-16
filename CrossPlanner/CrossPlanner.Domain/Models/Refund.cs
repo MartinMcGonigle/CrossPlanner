@@ -15,7 +15,9 @@ namespace CrossPlanner.Domain.Models
 
         public DateTime RefundDate { get; set; }
 
-        public string Reason { get; set; }
+        public string? Reason { get; set; }
+        
+        public string StripeRefundId { get; set; }
 
         [ForeignKey("MembershipId")]
         public Membership Membership { get; set; }

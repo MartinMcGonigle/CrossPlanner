@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Stripe;
 using System.Security.Claims;
 
 namespace CrossPlanner.Member.Controllers
@@ -91,17 +90,32 @@ namespace CrossPlanner.Member.Controllers
 
             try
             {
+                var existingMembership = CheckForExistingMembership();
+
+                if (existingMembership != null)
+                {
+                    _logger.LogWarning($"{logPrefix} - {_userId} already has an active membership.");
+                    return RedirectToAction(nameof(ExistingMembership));
+                }
+
                 var membershipPlan = GetMembershipPlan(model.Membership.MembershipPlanId);
+
+                if (membershipPlan == null)
+                {
+                    _logger.LogError($"{logPrefix} - Could not find membership plan with id {model.Membership.MembershipPlanId}");
+                    return View("Error");
+                }
 
                 if (membershipPlan.Type == (int)MembershipType.Monthly)
                 {
-                    model.Membership.EndDate = DateTime.Now.AddMonths((int)membershipPlan.NumberOfMonths);
-                } else if (membershipPlan.Type == (int)MembershipType.Weekly || membershipPlan.Type == (int)MembershipType.Unlimited)
-                {
-                    model.Membership.EndDate = DateTime.Now.AddMonths(1);
+                    model.Membership.EndDate = DateTime.Today.AddMonths((int)membershipPlan.NumberOfMonths).AddDays(-1).AddHours(23).AddMinutes(59);
                 }
-                
-                model.Membership.StartDate = DateTime.Now;
+                else if (membershipPlan.Type == (int)MembershipType.Weekly || membershipPlan.Type == (int)MembershipType.Unlimited)
+                {
+                    model.Membership.EndDate = DateTime.Today.AddMonths(1).AddDays(-1).AddHours(23).AddMinutes(59);
+                }
+
+                model.Membership.StartDate = DateTime.Today;
                 model.Membership.MemberId = _userId;
 
                 if (model.Membership.MembershipId == 0)
@@ -128,11 +142,19 @@ namespace CrossPlanner.Member.Controllers
         {
             try
             {
+                var existingMembership = CheckForExistingMembership();
+
+                if (existingMembership != null)
+                {
+                    _logger.LogWarning($"{logPrefix} - {_userId} already has an active membership.");
+                    return RedirectToAction(nameof(ExistingMembership));
+                }
+
                 var membership = GetMembershipByMembershipIdAndMemberId(membershipId);
 
                 if (membership == null)
                 {
-                    _logger.LogInformation($"{logPrefix} - Could not find membership with id {membershipId} for user with id: {_userId}");
+                    _logger.LogWarning($"{logPrefix} - Could not find membership with id {membershipId} for user with id: {_userId}");
                     return View("Error");
                 }
 
@@ -153,11 +175,19 @@ namespace CrossPlanner.Member.Controllers
         {
             try
             {
+                var existingMembership = CheckForExistingMembership();
+
+                if (existingMembership != null)
+                {
+                    _logger.LogWarning($"{logPrefix} - {_userId} already has an active membership.");
+                    return RedirectToAction(nameof(ExistingMembership));
+                }
+
                 var membership = GetMembershipByMembershipIdAndMemberId(model.MembershipId);
 
                 if (membership == null)
                 {
-                    _logger.LogInformation($"{logPrefix} - Could not find membership with id {model.MembershipId} for user with id: {_userId}");
+                    _logger.LogError($"{logPrefix} - Could not find membership with id {model.MembershipId} for user with id: {_userId}");
                     return View("Error");
                 }
 
@@ -180,6 +210,14 @@ namespace CrossPlanner.Member.Controllers
         {
             try
             {
+                var existingMembership = CheckForExistingMembership();
+
+                if (existingMembership != null)
+                {
+                    _logger.LogWarning($"{logPrefix} - {_userId} already has an active membership.");
+                    return RedirectToAction(nameof(ExistingMembership));
+                }
+
                 var membership = _repositoryWrapper.MembershipRepository
                     .FindByCondition(m => m.MembershipId == membershipId && m.MemberId == _userId)
                     .Include("MembershipPlan")
@@ -187,7 +225,7 @@ namespace CrossPlanner.Member.Controllers
 
                 if (membership == null)
                 {
-                    _logger.LogInformation($"{logPrefix} - Could not find membership with id {membershipId} for user with id: {_userId}");
+                    _logger.LogError($"{logPrefix} - Could not find membership with id {membershipId} for user with id: {_userId}");
                     return View("Error");
                 }
 
@@ -208,11 +246,19 @@ namespace CrossPlanner.Member.Controllers
         {
             try
             {
+                var existingMembership = CheckForExistingMembership();
+
+                if (existingMembership != null)
+                {
+                    _logger.LogWarning($"{logPrefix} - {_userId} already has an active membership.");
+                    return RedirectToAction(nameof(ExistingMembership));
+                }
+
                 var membership = GetMembershipByMembershipIdAndMemberId(membershipId);
 
                 if (membership == null)
                 {
-                    _logger.LogInformation($"{logPrefix} - Could not find membership with id {membershipId} for user with id: {_userId}");
+                    _logger.LogError($"{logPrefix} - Could not find membership with id {membershipId} for user with id: {_userId}");
                     return View("Error");
                 }
 
@@ -231,8 +277,22 @@ namespace CrossPlanner.Member.Controllers
         [HttpPost("payment-details")]
         public async Task<IActionResult> PaymentDetails(string stripeToken, int membershipId)
         {
+            if (string.IsNullOrEmpty(stripeToken) || membershipId == 0)
+            {
+                _logger.LogError($"{logPrefix} - {_userId} is trying to purchase membership but stripeToken = {stripeToken} and membershipId = {membershipId}");
+                return View("Error");
+            }
+
             try
             {
+                var existingMembership = CheckForExistingMembership();
+
+                if (existingMembership != null)
+                {
+                    _logger.LogWarning($"{logPrefix} - {_userId} already has an active membership.");
+                    return RedirectToAction(nameof(ExistingMembership));
+                }
+
                 var membership = _repositoryWrapper.MembershipRepository
                     .FindByCondition(m => m.MembershipId == membershipId && m.MemberId == _userId)
                     .Include("MembershipPlan")
@@ -246,6 +306,18 @@ namespace CrossPlanner.Member.Controllers
 
                 Int32.TryParse(User.FindFirst("Affiliate")?.Value, out int affiliateId);
                 var affiliate = GetAffiliateById(affiliateId);
+
+                if (affiliate == null)
+                {
+                    _logger.LogError($"{logPrefix} - Could not find affiliate with id {affiliateId}");
+                    return View("Error");
+                }
+
+                if (string.IsNullOrEmpty(affiliate.ConnectedAccountId))
+                {
+                    _logger.LogError($"{logPrefix} - Affiliate with id {affiliateId} does not have ConnectedAccountId.");
+                    return View("Error");
+                }
 
                 var customer = await _stripeService.GetOrCreateCustomer(User.FindFirst(ClaimTypes.Email)?.Value, stripeToken, affiliate.ConnectedAccountId);
                 var processPayment = await _stripeService.ProcessPayment(membership.MembershipPlan.Price, customer.Id, affiliate.ConnectedAccountId);
@@ -266,7 +338,7 @@ namespace CrossPlanner.Member.Controllers
                 }
                 else
                 {
-                    _logger.LogError("Payment failed for user {UserId} with membership ID {MembershipId}. Stripe Charge ID: {ChargeId}", _userId, membershipId, processPayment.PaymentId);
+                    _logger.LogError($"Payment failed for user with id {_userId} membership id {membershipId}. Stripe charge id: {processPayment.PaymentId}");
                     TempData["ErrorMessage"] = "We couldn't process your payment. Please check your card details and try again. If the problem persists, contact our support team.";
 
                     ViewData["HeaderType"] = "Payment Details";
@@ -306,7 +378,7 @@ namespace CrossPlanner.Member.Controllers
         {
             return _repositoryWrapper.MembershipPlanRepository
                 .FindAll()
-                .Where(mp => mp.IsActive && mp.AffiliateId == affiliateId)
+                .Where(mp => mp.AffiliateId == affiliateId && mp.IsActive)
                 .ToList();
         }
 

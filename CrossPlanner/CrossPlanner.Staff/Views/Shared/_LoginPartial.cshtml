@@ -14,24 +14,35 @@
             <li class="nav-item">
                 <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage Account">Hello @User.Identity.Name!</a>
             </li>
+            
             @if (User.IsInRole("SuperUser"))
             {
                 <li>
-                    <a class="nav-link text-dark" asp-controller="Staff" asp-action="Index">Staff</a>
+                    <a class="nav-link text-dark" asp-controller="User" asp-action="Index">Users</a>
                 </li>
 
-                    <li>
-                        <a class="nav-link text-dark" asp-controller="Membership" asp-action="Index">Memberships</a>
-                    </li>
+                @*
+                <li>
+                    <a class="nav-link text-dark" asp-controller="Staff" asp-action="Index">Staff</a>
+                </li>
+                *@
                 
                 <li>
-                    <a class="nav-link text-dark" asp-controller="Member" asp-action="Index">Members</a>
+                    <a class="nav-link text-dark" asp-controller="MembershipPlan" asp-action="Index">Membership Plans</a>
                 </li>
-                
+
+                @*
                 <li>
-                        <a class="nav-link text-dark" asp-controller="MembershipPlan" asp-action="Index">Membership Plans</a>
+                        <a class="nav-link text-dark" asp-controller="Member" asp-action="Index">Members</a>
                 </li>
+                *@
+
+
+                
+                
+
             }
+
             <li class="nav-item">
                 <form method="post" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Content("~/")" class="form-inline">
                     <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>

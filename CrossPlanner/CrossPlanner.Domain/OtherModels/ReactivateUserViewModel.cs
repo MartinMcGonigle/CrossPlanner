@@ -32,7 +32,5 @@ namespace CrossPlanner.Domain.OtherModels
         public string Role { get; set; }
 
         public List<SelectListItem>? Roles { get; set; }
-
-        public string ReturnController { get; set; }
     }
 }

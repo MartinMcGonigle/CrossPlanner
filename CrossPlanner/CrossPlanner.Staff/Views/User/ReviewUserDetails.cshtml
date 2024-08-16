@@ -4,6 +4,12 @@
     var today = DateTime.Now.ToString("yyyy-MM-dd");
 }
 
+<div class="row">
+    <div class="col-md-12">
+        <a asp-action="Index" class="btn btn-sm btn-secondary"><i class="fa fa-chevron-left" aria-hidden="true"></i> Go Back</a>
+    </div>
+</div>
+
 <div class="d-flex justify-content-center align-items-center">
     <div class="col-md-5">
         <section>
@@ -16,7 +22,6 @@
 
                         <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                         <input asp-for="ApplicationUserId" type="hidden" />
-                        <input asp-for="ReturnController" type="hidden" />
 
                         <div class="form-floating mb-3">
                             <input asp-for="FirstName" id="first-name" class="form-control" aria-required="true" readonly />

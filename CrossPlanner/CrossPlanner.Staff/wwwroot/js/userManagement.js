@@ -3,11 +3,9 @@
     document.querySelectorAll('.deactivate-account').forEach(button => {
         button.addEventListener('click', function () {
             const userId = this.dataset.id;
-            const userRole = this.dataset.role;
-            const userType = this.dataset.userType;
             const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
-            fetch(`/${userType}/DeactivateAccount?userId=${userId}&role=${userRole}`, {
+            fetch(`/User/DeactivateAccount?userId=${userId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -42,10 +40,9 @@
         button.addEventListener('click', function () {
             const userId = this.dataset.id;
             const userRole = this.dataset.role;
-            const userType = this.dataset.userType;
             const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
-            fetch(`/${userType}/ResendVerification?userId=${userId}&role=${userRole}`, {
+            fetch(`/User/ResendVerification?userId=${userId}&role=${userRole}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -66,7 +63,7 @@
 
                 .catch(error => {
                     $('#feedbackModalTitle').text('Error');
-                    $('#feedbackModalBody p').text('Failed to resend verification email.Please try again.');
+                    $('#feedbackModalBody p').text('Failed to resend verification email. Please try again.');
                     $('#feedbackModal').modal('show');
 
                     $('#feedbackModal').on('hidden.bs.modal', function () {
@@ -76,19 +73,21 @@
         });
     });
 
-    document.getElementById('add-existing-user').addEventListener('click', function () {
-        const userType = this.dataset.userType;
+    document.getElementById('add-existing-user').addEventListener('click', function (event) {
+        event.preventDefault();
 
-        fetch(`/${userType}/GetDeactivatedAccounts`)
-
+        fetch(`/User/GetDeactivatedAccounts`)
+       
             .then(response => response.json())
 
-            .then(data => {
+                .then(data => {
+
                 if (data.length === 0) {
                     $('#feedbackModalTitle').text('Add Existing User Status');
                     $('#feedbackModalBody p').text('There are no deactivated users available at this time. Please try again later or contact support for further assistance.');
                     $('#feedbackModal').modal('show');
                 } else {
+
                     const userDetailsTable = document.getElementById('user-details-table');
                     userDetailsTable.innerHTML = '';
 
@@ -101,7 +100,7 @@
                         addButton.textContent = 'Add';
                         addButton.className = 'btn btn-sm btn-green';
                         addButton.onclick = function () {
-                            window.location.href = `/${userType}/ReviewUserDetails?userId=${user.id}&userType=${userType}`;
+                            window.location.href = `/User/ReviewUserDetails?userId=${user.id}`;
                         };
                         actionCell.appendChild(addButton);
                     });

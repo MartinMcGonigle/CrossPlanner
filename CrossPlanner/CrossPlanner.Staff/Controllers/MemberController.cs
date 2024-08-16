@@ -26,14 +26,23 @@ namespace CrossPlanner.Staff.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index(string q, int page = 1, int pageSize = 25)
         {
             Int32.TryParse(User.FindFirst("Affiliate")?.Value, out int affiliateId);
             _memberLogger.LogInformation($"{memberLogPrefix} - Attempting to display members of affiliate with id {affiliateId}");
 
-            var affiliateMembers = _repositoryWrapper.ApplicationUserRepository.GetAffiliateMembers(affiliateId);
+            var data = _repositoryWrapper.AffiliateRepository.GetAffiliateMembers(q, affiliateId, page, pageSize);
+            var count = _repositoryWrapper.AffiliateRepository.GetAffiliateMembersCount(q, affiliateId);
 
-            return View(affiliateMembers);
+            ViewData["CurrentFilter"] = q;
+
+            // Paging
+            ViewData["Page"] = page;
+            ViewData["PageSize"] = pageSize;
+            ViewData["RecordCount"] = count;
+            ViewData["Action"] = "Index";
+
+            return View(data);
         }
     }
 }

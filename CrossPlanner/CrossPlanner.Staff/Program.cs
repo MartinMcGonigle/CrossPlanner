@@ -68,13 +68,13 @@ builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, MyUserC
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.AddScoped<IStripeService, StripeService>();
 
 builder.Services.AddDataProtection()
     .SetApplicationName("CrossPlanner")
     .PersistKeysToFileSystem(new DirectoryInfo(@"C:\logs\Keys"))
     .ProtectKeysWithCertificate(builder.Configuration.GetSection("Cert").Value);
 
-builder.Services.AddScoped<IStripeService, StripeService>();
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
 var app = builder.Build();

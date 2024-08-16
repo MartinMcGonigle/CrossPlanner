@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CrossPlanner.Staff.Controllers
 {
-    [Authorize(Roles = "SuperUser")]
+    [Authorize(Roles = "SuperUser,Manager")]
     public class MembershipPlanController : Controller
     {
         private readonly ILogger<MembershipPlanController> _logger;
@@ -21,13 +21,25 @@ namespace CrossPlanner.Staff.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index(string q, int page = 1, int pageSize = 25, string statusSearch = "0", string typeSearch = "0")
         {
             Int32.TryParse(User.FindFirst("Affiliate")?.Value, out int affiliateId);
             _logger.LogInformation($"{logPrefix} - Attempting to display membership plans of affiliate with id {affiliateId}");
 
-            var affiliateMembershipPlans = _repositoryWrapper.MembershipPlanRepository.GetAffiliateMembershipPlans(affiliateId);
-            return View(affiliateMembershipPlans);
+            var data = _repositoryWrapper.MembershipPlanRepository.GetAffiliateMembershipPlans(affiliateId, q, page, pageSize, statusSearch, typeSearch);
+            var count = _repositoryWrapper.MembershipPlanRepository.GetAffiliateMembershipPlansCount(affiliateId, q, statusSearch, typeSearch);
+
+            ViewData["CurrentFilter"] = q;
+            ViewData["StatusSearch"] = statusSearch;
+            ViewData["TypeSearch"] = typeSearch;
+
+            // Paging
+            ViewData["Page"] = page;
+            ViewData["PageSize"] = pageSize;
+            ViewData["RecordCount"] = count;
+            ViewData["Action"] = "Index";
+
+            return View(data);
         }
 
         [HttpGet]

@@ -20,7 +20,7 @@ namespace CrossPlanner.Domain.Models
 
         [MaxLength(250)]
         [Display(Name = "Description")]
-        public string? Description { get; set; }
+        public string Description { get; set; }
 
         [Required]
         [Display(Name = "Active")]

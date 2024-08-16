@@ -1,0 +1,329 @@
+﻿@model IEnumerable<AffiliateUsersViewModel>
+@{
+    ViewData["Title"] = "Users";
+    var pageSize = 0;
+
+    string linkedToGymSearch = ViewData["LinkedToGymSearch"]?.ToString() ?? "0";
+    string emailConfirmedSearch = ViewData["EmailConfirmedSearch"]?.ToString() ?? "0";
+    string activeMembershipSearch = ViewData["ActiveMembershipSearch"]?.ToString() ?? "0";
+    string roleSearch = ViewData["RoleSearch"]?.ToString() ?? "0";
+
+    if (ViewData["PageSize"] != null && ViewData["RecordCount"] != null)
+    {
+        pageSize = int.Parse(ViewData["PageSize"].ToString());
+    }
+
+    List<SelectListItem> LinkedToGymList = new List<SelectListItem>
+    {
+        new SelectListItem("Linked to gym", "1"),
+        new SelectListItem("Not linked to gym", "2")
+    };
+
+    List<SelectListItem> EmailConfirmedList = new List<SelectListItem>
+    {
+        new SelectListItem("Email Confirmed", "1"),
+        new SelectListItem("Email Not Confirmed", "2")
+    };
+
+    List<SelectListItem> ActiveMembershipList = new List<SelectListItem>
+    {
+        new SelectListItem("Active Membership", "1"),
+        new SelectListItem("No Active Membership", "2")
+    };
+
+    List<SelectListItem> RoleList = new List<SelectListItem>
+    {
+        new SelectListItem("Coach", "Coach"),
+        new SelectListItem("Manager", "Manager"),
+        new SelectListItem("Member", "Member"),
+        new SelectListItem("SuperUser", "SuperUser"),
+    };
+}
+
+<form id="filterForm" asp-action="Index" method="get" class="mb-3">
+    <div class="card bg-light">
+        <div class="card-body">
+            <div role="search">
+                <div class="row">
+                    
+                    <div class="col-md-3 mb-4">
+                        <label for="linkedToGymSearch">Linked to Gym</label>
+                        <select class="form-control" id="linkedToGymSearch" name="linkedToGymSearch">
+                            <option value="0">Display All</option>
+                            @foreach (var ltg in LinkedToGymList)
+                            {
+                                if (ltg.Value == linkedToGymSearch)
+                                {
+                                    <option selected value="@ltg.Value">@ltg.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@ltg.Value">@ltg.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 mb-4">
+                        <label for="emailConfirmedSearch">
+                            Email Confirmed
+                            <i class="fa fa-info-circle" data-bs-toggle="tooltip" title="Filter applies only to users currently linked to your affiliate"></i>
+                        </label>
+                        <select class="form-control" id="emailConfirmedSearch" name="emailConfirmedSearch">
+                            <option value="0">Display All</option>
+                            @foreach (var ec in EmailConfirmedList)
+                            {
+                                if (ec.Value == emailConfirmedSearch)
+                                {
+                                    <option selected value="@ec.Value">@ec.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@ec.Value">@ec.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 mb-4">
+                        <label for="activeMembershipSearch">
+                            Active Membership
+                            <i class="fa fa-info-circle" data-bs-toggle="tooltip" title="Filter applies only to users currently linked to your affiliate"></i>
+                        </label>
+                        <select class="form-control" id="activeMembershipSearch" name="activeMembershipSearch">
+                            <option value="0">Display All</option>
+                            @foreach (var am in ActiveMembershipList)
+                            {
+                                if(am.Value == activeMembershipSearch)
+                                {
+                                    <option selected value="@am.Value">@am.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@am.Value">@am.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 mb-4">
+                        <label for="roleSearch">
+                            Role
+                            <i class="fa fa-info-circle" data-bs-toggle="tooltip" title="Filter applies only to users currently linked to your affiliate"></i>
+                        </label>
+                        <select class="form-control" id="roleSearch" name="roleSearch">
+                            <option value="0">Display All</option>
+                            @foreach (var r in RoleList)
+                            {
+                                if (r.Value == roleSearch)
+                                {
+                                    <option selected value="@r.Value">@r.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@r.Value">@r.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-12 mb-4 mb-md-0">
+                        <label for="query">Search</label>
+                        <i class="fa fa-info-circle" data-bs-toggle="tooltip" title="Filter applies only to name, and email"></i>
+                        <div class="input-group mb-3">
+                            <input class="form-control" type="text" id="q" name="q" placeholder="Search" value="@ViewData["CurrentFilter"]" id="query">
+                            <div class="input-group-lg">
+                                <button type="submit" class="btn btn-green"><i class="fa fa-search" aria-hidden="true"></i> Search</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <input type="hidden" name="page" value="1" />
+                        <input type="hidden" name="pageSize" value="@pageSize" />
+                    </div>
+                </div>
+
+                <div class="float-right">
+                    <button id="add-existing-user" class="btn btn-secondary"><i class="fa fa-plus" aria-hidden="true"></i> Add Existing User</button>
+                    <a class="btn btn-secondary" asp-area="Identity" asp-page="/Account/CreateAccount" asp-route-returnController="User"><i class="fas fa-user-plus" aria-hidden="true"></i> Create</a>
+                    <button id="clear-filters" class="btn btn-secondary collapse">
+                        <i class="fa fa-times" aria-hidden="true"></i> Clear Filters
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<br />
+
+@if (Model.Count() > 0)
+{
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>
+                    Name
+                </th>
+
+                <th>
+                    Date of Birth
+                </th>
+
+                <th>
+                    Email
+                </th>
+
+                <th>
+                    Linked to Gym
+                </th>
+
+                <th>
+                    Email Confirmed
+                </th>
+
+                <th>
+                    Active Membership
+                </th>
+
+                <th>
+                    Role
+                </th>
+
+                <th>
+
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @item.FirstName @item.LastName
+                    </td>
+
+                    <td>
+                        @item.DateOfBirth.ToShortDateString()
+                    </td>
+
+                    <td>
+                        @item.Email
+                    </td>
+
+                    <td>
+                        @if (item.AffiliateUserLink)
+                        {
+                            <span class="text-success"><i class="fa fa-check"></i></span>
+                        }
+                        else
+                        {
+                            <span class="text-danger"><i class="fa fa-times"></i></span>
+                        }
+                    </td>
+
+                    <td>
+                        @* We only make this visible if the user is currently linked to the affiliate *@
+                        @if (item.AffiliateUserLink)
+                        {
+                            @if (item.EmailConfirmed)
+                            {
+                                <span class="text-success"><i class="fa fa-check"></i></span>
+                            }
+                            else
+                            {
+                                <span class="text-danger"><i class="fa fa-times"></i></span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-muted">Not Available</span>
+                        }
+                    </td>
+
+                    <td>
+                        @* We only make this visible if the user is currently linked to the affiliate *@
+                        @if (item.AffiliateUserLink)
+                        {
+                            @if (item.ActiveMembership)
+                            {
+                                <span class="text-success"><i class="fa fa-check"></i></span>
+                            }
+                            else
+                            {
+                                <span class="text-danger"><i class="fa fa-times"></i></span>
+                            }
+                            
+                        }
+                        else
+                        {
+                            <span class="text-muted">Not Available</span>
+                        }
+                    </td>
+
+                    <td>
+                        @* We only make this visible if the user is currently linked to the affiliate *@
+                        @if (item.AffiliateUserLink)
+                        {
+                            @item.RoleName
+                        }
+                        else
+                        {
+                            <span class="text-muted">Not Available</span>
+                        }
+                    </td>
+
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdown-@item.AspNetUserId" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Actions
+                            </button>
+
+                            <div class="dropdown-menu" aria-labelledby="dropdown-@item.AspNetUserId">
+                                @if (item.AffiliateUserLink && !item.EmailConfirmed)
+                                {
+                                    <button data-id="@item.AspNetUserId" data-role="@item.RoleName" class="dropdown-item resend-verification"><i class="fa fa-mail-bulk" aria-hidden="true"></i> Resend Verification</button>
+                                }
+
+                                @if (item.AffiliateUserLink)
+                                {
+                                    <a class="dropdown-item" asp-area="Identity" asp-page="/Account/EditAccount" asp-route-applicationUserId="@item.AspNetUserId" asp-route-returnController="User"><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
+                                }
+
+                                @if (!(item.AspNetUserId == User.FindFirstValue(ClaimTypes.NameIdentifier)) && item.AffiliateUserLink && !item.ActiveMembership)
+                                {
+                                    <button data-id="@item.AspNetUserId" class="dropdown-item deactivate-account"><i class="fa fa-ban" aria-hidden="true"></i> Deactivate Account</button>
+                                }
+
+                                @if (item.MembershipHistory)
+                                {
+                                    <a class="dropdown-item" asp-controller="Membership" asp-action="ViewMembership" asp-route-applicationUserId="@item.AspNetUserId"><i class="fas fa-eye" aria-hidden="true"></i> Membership</a>
+                                }
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <partial name="_Pagination" />
+}
+else
+{
+    <div class="alert alert-info mt-4 text-center">
+        <h4 class="alert-heading">No Users Available</h4>
+        <p>There are no users matching your search criteria. Please try adjusting your filters or search terms.</p>
+    </div>
+}
+
+<partial name="_FeedbackModal" />
+<partial name="_UserSelectionModal" />
+
+@section Scripts {
+    <script src="~/js/userFilter.js"></script>
+    <script src="~/js/userManagement.js"></script>
+}

@@ -26,6 +26,7 @@
             const validations = [
                 isValidLength(inputs.title.value, 1),
                 isValidLength(inputs.price.value, 1),
+                isValidLength(inputs.description.value, 1),
                 isValidLength(inputs.membershipType.value, 1),
             ];
 

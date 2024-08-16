@@ -1,7 +1,96 @@
 ﻿@model IEnumerable<MembershipPlan>
 @{
     ViewData["Title"] = "Membership Plans";
+    var pageSize = 0;
+
+    string statusSearch = ViewData["StatusSearch"]?.ToString() ?? "0";
+    string typeSearch = ViewData["TypeSearch"]?.ToString() ?? "0";
+
+    if (ViewData["PageSize"] != null && ViewData["RecordCount"] != null)
+    {
+        pageSize = int.Parse(ViewData["PageSize"].ToString());
+    }
+
+    List<SelectListItem> StatusList = new List<SelectListItem>
+    {
+        new SelectListItem("Active", "1"),
+        new SelectListItem("Not Active", "2")
+    };
+
+    List<SelectListItem> TypeList = Html.GetEnumSelectList<MembershipType>().ToList();
 }
+
+<form id="filterForm" asp-action="Index" method="get" class="mb-3">
+    <div class="card bg-light">
+        <div class="card-body">
+            <div role="search">
+                <div class="row">
+
+                    <div class="col-md-3 mb-4">
+                        <label for="statusSearch">Status</label>
+                        <select class="form-control" id="statusSearch" name="statusSearch">
+                            <option value="0">Display All</option>
+                            @foreach (var s in StatusList)
+                            {
+                                if (s.Value == statusSearch)
+                                {
+                                    <option selected value="@s.Value">@s.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@s.Value">@s.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 mb-4">
+                        <label for="typeSearch">Type</label>
+                        <select class="form-control" id="typeSearch" name="typeSearch">
+                            <option value="0">Display All</option>
+                            @foreach (var t in TypeList)
+                            {
+                                if (t.Value == typeSearch)
+                                {
+                                    <option selected value="@t.Value">@t.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@t.Value">@t.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-4 mb-md-0">
+                        <label for="query">Search</label>
+                        <div class="input-group mb-3">
+                            <input class="form-control" type="text" id="q" name="q" placeholder="Search" value="@ViewData["CurrentFilter"]" id="query">
+                            <div class="input-group-lg">
+                                <button type="submit" class="btn btn-green"><i class="fa fa-search" aria-hidden="true"></i> Search</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <input type="hidden" name="page" value="1" />
+                        <input type="hidden" name="pageSize" value="@pageSize" />
+                    </div>
+                </div>
+
+                <div class="float-right">
+                    <a class="btn btn-secondary" asp-action="Create"><i class="fas fa-circle-plus" aria-hidden="true"></i> Create Membership Plan</a>
+                    <button id="clear-filters" class="btn btn-secondary collapse">
+                        <i class="fa fa-times" aria-hidden="true"></i> Clear Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<br>
 
 @if (TempData["ErrorMessage"] != null)
 {
@@ -9,27 +98,11 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         @TempData["ErrorMessage"]
     </div>
+    <br />
 }
 
 @if (Model.Count() > 0)
 {
-    <div class="card bg-light mb-3">
-        <div class="card-body">
-            <div role="search">
-                <div class="row">
-                    <div class="col-md-12 mb-4">
-                        <partial name="PropertyDetailsTableSearch" />
-                    </div>
-                </div>
-
-                <div class="float-right">
-                    <a class="btn btn-secondary" asp-action="Create"><i class="fas fa-circle-plus" aria-hidden="true"></i> Create Membership Plan</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <br />
-
     <table class="table table-bordered table-hover">
         <thead>
             <tr>
@@ -121,25 +194,18 @@
             }
         </tbody>
     </table>
-
-    <div class="alert alert-info" id="no-results" style="display: none;">
-        No membership plans found. Please adjust your search criteria.
-    </div>
+    <partial name="_Pagination" />
 }
 else
 {
-    <div class="alert alert-info" role="alert">
-        There are no membership plans to display. Please try again after some time.
-    </div>
-
-    <div class="float-right">
-        <a class="btn btn-secondary" asp-action="Create"><i class="fas fa-circle-plus" aria-hidden="true"></i> Create Membership Plan</a>
+    <div class="alert alert-info mt-4 text-center">
+        <h4 class="alert-heading">No Membership Plans Available</h4>
+        <p>There are no membership plans matching your search criteria. Please try adjusting your filters or search terms.</p>
     </div>
 }
 
 <partial name="_FeedbackModal" />
 
 @section Scripts {
-    <script src="~/js/propertyDetailsTableSearch.js"></script>
     <script src="~/js/membershipPlanManagement.js"></script>
 }

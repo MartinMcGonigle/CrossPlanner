@@ -9,6 +9,6 @@ namespace CrossPlanner.Service.Stripe
 
         public Task<(bool Success, string Message, string PaymentId)> ProcessPayment(decimal amount, string customerId, string connectedAccountId);
 
-        public Task<(bool Success, string Message)> RefundCustomer(decimal refundAmount, string lastPaymentId);
+        public Task<(bool Success, string Message, string RefundId)> RefundCustomer(decimal refundAmount, string lastPaymentId, string connectedAccountId);
     }
 }

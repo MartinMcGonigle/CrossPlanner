@@ -1,4 +1,5 @@
 ﻿using CrossPlanner.Domain.Models;
+using CrossPlanner.Domain.OtherModels;
 
 namespace CrossPlanner.Repository.Interfaces
 {
@@ -8,6 +9,8 @@ namespace CrossPlanner.Repository.Interfaces
 
         public Task<IEnumerable<ApplicationUser>> GetDeactivatedUsers();
 
-        public IEnumerable<ApplicationUser> GetAffiliateMembers(int affiliateId);
+        public IEnumerable<AffiliateUsersViewModel> GetAffiliateUsers(string q, int affiliateId, int page, int pageSize, string linkedToGymSearch, string emailConfirmedSearch, string activeMembershipSearch, string roleSearch);
+
+        public int GetAffiliateUsersCount(string q, int affiliateId, string linkedToGymSearch, string emailConfirmedSearch, string activeMembershipSearch, string roleSearch);
     }
 }

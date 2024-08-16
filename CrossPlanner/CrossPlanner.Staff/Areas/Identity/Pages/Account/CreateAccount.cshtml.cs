@@ -13,7 +13,7 @@ using System.Text.Encodings.Web;
 
 namespace CrossPlanner.Staff.Areas.Identity.Pages.Account
 {
-    [Authorize(Roles = "SuperUser")]
+    [Authorize(Roles = "SuperUser,Manager")]
     public class CreateAccountModel : PageModel
     {
         private readonly ILogger<CreateAccountModel> _logger;

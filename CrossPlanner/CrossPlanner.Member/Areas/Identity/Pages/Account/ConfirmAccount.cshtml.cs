@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Encodings.Web;
 using System.Text;
+using CrossPlanner.Service.Messages;
 using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace CrossPlanner.Member.Areas.Identity.Pages.Account
@@ -14,17 +15,17 @@ namespace CrossPlanner.Member.Areas.Identity.Pages.Account
     public class ConfirmAccountModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IEmailSender _emailSender;
         private readonly ILogger<ConfirmAccountModel> _logger;
+        private readonly IEmailSender _emailSender;
 
         public ConfirmAccountModel(
             UserManager<ApplicationUser> userManager,
-            IEmailSender emailSender,
-            ILogger<ConfirmAccountModel> logger)
+            ILogger<ConfirmAccountModel> logger,
+            IEmailSender emailSender)
         {
             _userManager = userManager;
-            _emailSender = emailSender;
             _logger = logger;
+            _emailSender = emailSender;
         }
 
         [TempData]

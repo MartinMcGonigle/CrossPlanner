@@ -10,7 +10,7 @@ using CrossPlanner.Service.Stripe;
 
 namespace CrossPlanner.Staff.Controllers
 {
-    [Authorize(Roles = "SuperUser")]
+    [Authorize(Roles = "SuperUser,Manager")]
     public class MembershipController : Controller
     {
         private readonly ILogger<MembershipController> _logger;
@@ -32,40 +32,20 @@ namespace CrossPlanner.Staff.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index(string q, int page = 1, int pageSize = 25)
+        public IActionResult ViewMembership(string applicationUserId)
         {
             Int32.TryParse(User.FindFirst("Affiliate")?.Value, out int affiliateId);
-            _logger.LogInformation($"{logPrefix} - Displaying memberships for affiliate with id {affiliateId}");
+            _logger.LogInformation($"{logPrefix} - Displaying memberships for member with id {applicationUserId} for affiliate with id {affiliateId}");
 
-            var data = _repositoryWrapper.MembershipRepository.GetAffiliateMemberships(q, affiliateId, page, pageSize);
-            var count = _repositoryWrapper.MembershipRepository.GetAffiliateMembershipsCount(q, affiliateId, page, pageSize);
-
-            ViewData["CurrentFilter"] = q;
-
-            // Paging
-            ViewData["Page"] = page;
-            ViewData["PageSize"] = pageSize;
-            ViewData["RecordCount"] = count;
-            ViewData["Action"] = "Index";
-
-            return View(data);
-        }
-
-        [HttpGet]
-        public IActionResult ManageMembership(string memberId)
-        {
-            Int32.TryParse(User.FindFirst("Affiliate")?.Value, out int affiliateId);
-            _logger.LogInformation($"{logPrefix} - Displaying memberships for member with id {memberId} for affiliate with id {affiliateId}");
-
-            var data = _repositoryWrapper.MembershipRepository.GetUserMemberships(affiliateId, memberId);
+            var data = _repositoryWrapper.MembershipRepository.GetUserMemberships(affiliateId, applicationUserId);
 
             return View(data);
         }
 
         [HttpPut]
-        public async Task<IActionResult> DeactivateMembership(int membershipId)
+        public async Task<IActionResult> CancelMembership(int membershipId)
         {
-            _logger.LogInformation($"{logPrefix} - Attempting to deactivate membership with id {membershipId}");
+            _logger.LogInformation($"{logPrefix} - Attempting to cancel membership with id {membershipId}");
 
             using (var transaction = _repositoryWrapper.BeginTransaction())
             {
@@ -76,18 +56,34 @@ namespace CrossPlanner.Staff.Controllers
                         .Include("MembershipPlan")
                         .FirstOrDefault();
 
-                    if (membership == null)
+                    if (membership == null || string.IsNullOrEmpty(membership.LastPaymentId))
                     {
-                        _logger.LogWarning($"{logPrefix} - Unable to deactivate membership with id {membershipId} as could not be found");
+                        _logger.LogWarning($"{logPrefix} - Unable to cancel membership with id {membershipId} as could not be found");
                         return Json(new { message = "Membership could not be found." });
                     }
-                    
-                    decimal refundAmount = CalculateRefundAmount(membership);
-                    var (success, message) = await _stripeService.RefundCustomer(refundAmount, membership.LastPaymentId);
 
-                    if (success)
+                    Int32.TryParse(User.FindFirst("Affiliate")?.Value, out int affiliateId);
+                    var affiliate = GetAffiliateById(affiliateId);
+
+                    if (affiliate == null)
+                    {
+                        _logger.LogError($"{logPrefix} - Could not find affiliate with id {affiliateId}");
+                        return Json(new { message = "Unable to cancel membership." });
+                    }
+
+                    if (string.IsNullOrEmpty(affiliate.ConnectedAccountId))
+                    {
+                        _logger.LogError($"{logPrefix} - Affiliate with id {affiliateId} does not have ConnectedAccountId.");
+                        return Json(new { message = "Unable to cancel membership." });
+                    }
+
+                    decimal refundAmount = CalculateRefundAmount(membership);
+                    var processRefund = await _stripeService.RefundCustomer(refundAmount, membership.LastPaymentId, affiliate.ConnectedAccountId);
+
+                    if (processRefund.Success)
                     {
                         membership.IsActive = false;
+                        membership.AutoRenew = false;
                         membership.PaymentStatus = PaymentStatus.Refunded;
                         _repositoryWrapper.MembershipRepository.Update(membership);
 
@@ -95,25 +91,28 @@ namespace CrossPlanner.Staff.Controllers
                         {
                             MembershipId = membership.MembershipId,
                             Amount = refundAmount,
-                            RefundDate = DateTime.Now
+                            RefundDate = DateTime.Now,
+                            StripeRefundId =processRefund.RefundId,
                         };
 
                         _repositoryWrapper.RefundRepository.Create(refund);
                         _repositoryWrapper.Save();
                         transaction.Commit();
 
-                        _logger.LogInformation($"{logPrefix} - Membership with ID: {membershipId} has been successfully deactivated");
-                        return Json(new { message = "Membership deactivated." });
+                        _logger.LogInformation($"{logPrefix} - Membership with id {membershipId} has been successfully canceled");
+                        return Json(new { message = "Membership canceled." });
                     }
-
-                    _logger.LogWarning($"{logPrefix} - Failed to deactivate membership with id {membershipId}: {message}");
-                    return Json(new { message = "Membership could not be deactivated. " + message });
+                    else
+                    {
+                        _logger.LogError($"{logPrefix} - Failed to cancel membership with id {membershipId }");
+                        return Json(new { message = "Unable to cancel membership." });
+                    }
                 }
                 catch (Exception ex)
                 {
                     transaction.Rollback();
-                    _logger.LogError($"{logPrefix} - An error occurred while attempting to deactivate membership with id {membershipId}: {ex}");
-                    return Json(new { message = "An error occurred while deactivating membership." });
+                    _logger.LogError($"{logPrefix} - An error occurred while attempting to cancel membership with id {membershipId}: {ex}");
+                    return Json(new { message = "An error occurred while canceling membership." });
                 }
             }
         }
@@ -156,6 +155,35 @@ namespace CrossPlanner.Staff.Controllers
                 _logger.LogWarning($"{logPrefix} - Encountered an unrecognized membership type for membership with id: {model.MembershipId}");
                 return 0;
             }
+        }
+
+        // Maybe implement the below at a later date
+
+        [HttpGet]
+        public IActionResult Index(string q, int page = 1, int pageSize = 25)
+        {
+            Int32.TryParse(User.FindFirst("Affiliate")?.Value, out int affiliateId);
+            _logger.LogInformation($"{logPrefix} - Displaying memberships for affiliate with id {affiliateId}");
+
+            var data = _repositoryWrapper.MembershipRepository.GetAffiliateMemberships(q, affiliateId, page, pageSize);
+            var count = _repositoryWrapper.MembershipRepository.GetAffiliateMembershipsCount(q, affiliateId, page, pageSize);
+
+            ViewData["CurrentFilter"] = q;
+
+            // Paging
+            ViewData["Page"] = page;
+            ViewData["PageSize"] = pageSize;
+            ViewData["RecordCount"] = count;
+            ViewData["Action"] = "Index";
+
+            return View(data);
+        }
+
+        private Affiliate GetAffiliateById(int affiliateId)
+        {
+            return _repositoryWrapper.AffiliateRepository
+                .FindByCondition(a => a.AffiliateId == affiliateId)
+                .FirstOrDefault();
         }
     }
 }

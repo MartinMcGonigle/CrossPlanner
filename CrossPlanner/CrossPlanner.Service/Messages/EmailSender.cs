@@ -28,10 +28,12 @@ namespace CrossPlanner.Service.Messages
                 message.To.Add(new MailboxAddress("", email));
                 message.Subject = subject;
 
-                message.Body = new TextPart(MimeKit.Text.TextFormat.Html)
-                {
-                    Text = htmlMessage
-                };
+                // Add plain text alternative
+                var builder = new BodyBuilder();
+                builder.HtmlBody = htmlMessage;
+                builder.TextBody = HtmlToPlainText(htmlMessage);
+
+                message.Body = builder.ToMessageBody();
 
                 using (var client = new SmtpClient())
                 {
@@ -45,6 +47,13 @@ namespace CrossPlanner.Service.Messages
             {
                 throw ex;
             }
+        }
+
+        private string HtmlToPlainText(string html)
+        {
+            var doc = new HtmlAgilityPack.HtmlDocument();
+            doc.LoadHtml(html);
+            return doc.DocumentNode.InnerText;
         }
     }
 }

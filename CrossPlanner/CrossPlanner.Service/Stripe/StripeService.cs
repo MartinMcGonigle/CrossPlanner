@@ -68,7 +68,7 @@ namespace CrossPlanner.Service.Stripe
             }
         }
 
-        public async Task<(bool Success, string Message)> RefundCustomer(decimal refundAmount, string lastPaymentId)
+        public async Task<(bool Success, string Message, string RefundId)> RefundCustomer(decimal refundAmount, string lastPaymentId, string connectedAccountId)
         {
             var refundOptions = new RefundCreateOptions
             {
@@ -78,14 +78,20 @@ namespace CrossPlanner.Service.Stripe
 
             var refundService = new RefundService();
 
+            var requestOptions = new RequestOptions
+            {
+                StripeAccount = connectedAccountId
+            };
+
             try
             {
-                var refund = await refundService.CreateAsync(refundOptions);
-                return (refund.Status == "succeeded", refund.Status);
+                var refund = await refundService.CreateAsync(refundOptions, requestOptions);
+                bool success = refund.Status == "succeeded";
+                return (success, refund.Status, success ? refund.Id : null);
             }
             catch (StripeException ex)
             {
-                return (false, ex.Message);
+                return (false, ex.Message, null);
             }
         }
     }

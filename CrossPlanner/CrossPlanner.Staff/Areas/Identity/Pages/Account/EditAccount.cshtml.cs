@@ -9,7 +9,7 @@ using System.Web.Mvc;
 
 namespace CrossPlanner.Staff.Areas.Identity.Pages.Account
 {
-    [Authorize(Roles = "SuperUser")]
+    [Authorize(Roles = "SuperUser,Manager")]
     public class EditAccountModel : PageModel
     {
         private readonly ILogger<CreateAccountModel> _logger;
