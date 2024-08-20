@@ -21,6 +21,8 @@ namespace CrossPlanner.Repository.Wrapper
 
         IRefundRepository RefundRepository { get; }
 
+        IClassTypeRepository ClassTypeRepository { get; }
+
         void Save();
 
         Task SaveAsync();

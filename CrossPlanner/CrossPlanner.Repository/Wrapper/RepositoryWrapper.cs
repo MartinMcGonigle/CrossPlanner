@@ -135,6 +135,21 @@ namespace CrossPlanner.Repository.Wrapper
             }
         }
 
+        private IClassTypeRepository _classTypeRepository;
+
+        public IClassTypeRepository ClassTypeRepository
+        {
+            get
+            {
+                if (_classTypeRepository == null)
+                {
+                    _classTypeRepository = new ClassTypeRepository(_applicationContext);
+                }
+
+                return _classTypeRepository;
+            }
+        }
+
         public void Save()
         {
             _applicationContext.SaveChanges();

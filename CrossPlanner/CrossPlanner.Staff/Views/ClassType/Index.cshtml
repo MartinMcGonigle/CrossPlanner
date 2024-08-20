@@ -1,0 +1,91 @@
+﻿@model IEnumerable<ClassType>
+@{
+    ViewData["Title"] = "Class Types";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <a class="btn btn-secondary" asp-action="Create"><i class="fas fa-circle-plus" aria-hidden="true"></i> Create Class Type</a>
+    </div>
+</div>
+<br />
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        @TempData["ErrorMessage"]
+    </div>
+    <br />
+}
+
+@if (Model.Count() > 0)
+{
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>
+                    Title
+                </th>
+
+                <th>
+                    Active
+                </th>
+
+                <th>
+
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @item.Title
+                    </td>
+
+                    <td>
+                        @(item.IsActive ? "Yes" : "No")
+                    </td>
+
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdown-@item.ClassTypeId" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Actions
+                            </button>
+
+                            <div class="dropdown-menu" aria-labelledby="dropdown-@item.ClassTypeId">
+                                <a class="dropdown-item" asp-action="Edit" asp-route-classTypeId="@item.ClassTypeId" ><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
+
+                                <button data-id="@item.ClassTypeId" class="dropdown-item toggle-class-type">
+                                    <i class="fa @(item.IsActive ? "fa-toggle-off" : "fa-toggle-on")" aria-hidden="true"></i>
+                                    @(item.IsActive ? "Deactivate Class Type" : "Reactivate Class Type")
+                                </button>
+
+                                <button data-id="@item.ClassTypeId" class="dropdown-item delete-class-type">
+                                    <i class="far fa-trash-alt" aria-hidden="true"></i>
+                                    Delete Class Type
+                                </button>
+                            </div> 
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info mt-4 text-center">
+        <h4 class="alert-heading">No Class Types Available</h4>
+        <p>There are no class types matching your search criteria. Please try adjusting your filters or search terms.</p>
+    </div>
+}
+
+<partial name="_FeedbackModal" />
+
+@section Scripts{
+    <script src="~/js/classTypeManagement.js"></script>
+}
