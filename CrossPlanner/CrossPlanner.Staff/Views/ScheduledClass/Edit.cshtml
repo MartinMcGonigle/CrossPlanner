@@ -1,0 +1,78 @@
+﻿@model ScheduledClassViewModel
+@{
+    ViewData["Title"] = "Edit Class";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <a asp-action="Index" class="btn btn-sm btn-secondary"><i class="fas fa-chevron-left" aria-hidden="true"></i> Go Back</a>
+    </div>
+</div>
+
+<div class="d-flex justify-content-center align-items-center">
+    <div class="col-md-5">
+        <section>
+            <form id="scheduledClass" method="post">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h3>Edit class</h3>
+                        <hr />
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                        <input asp-for="ScheduledClass.ScheduledClassId" type="hidden" />
+
+                        <div class="form-floating mb-3">
+                            <select asp-for="ScheduledClass.ClassTypeId" id="class-type-id" class="form-control" aria-required="true">
+                                <option disabled selected value="">-- Select Class Type --</option>
+                                @foreach (var classType in Model.ClassTypes)
+                                {
+                                    <option value="@classType.ClassTypeId">@classType.Title</option>
+                                }
+                            </select>
+                            <label asp-for="ScheduledClass.ClassTypeId" class="form-label">Class Type <span class="required">*</span></label>
+                            <span asp-validation-for="ScheduledClass.ClassTypeId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <select asp-for="ScheduledClass.InstructorId" id="instructor-id" class="form-control" aria-required="true">
+                                <option disabled selected value="">-- Select Instructor --</option>
+                                @foreach (var instructor in Model.Instructors)
+                                {
+                                    <option value="@instructor.Id">@instructor.FirstName @instructor.LastName</option>
+                                }
+                            </select>
+                            <label asp-for="ScheduledClass.InstructorId" class="form-label">Instructor <span class="required">*</span></label>
+                            <span asp-validation-for="ScheduledClass.InstructorId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="ScheduledClass.StartDateTime" id="start-date-time" class="form-control" aria-required="true" type="datetime-local" min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                            <label asp-for="ScheduledClass.StartDateTime" class="form-label">Start Date Time <span class="required">*</span></label>
+                            <span asp-validation-for="ScheduledClass.StartDateTime" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="ScheduledClass.EndDateTime" id="end-date-time" class="form-control" aria-required="true" type="datetime-local" min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                            <label asp-for="ScheduledClass.EndDateTime" class="form-label">End Date Time <span class="required">*</span></label>
+                            <span asp-validation-for="ScheduledClass.EndDateTime" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="ScheduledClass.Capacity" id="capacity" class="form-control" type="number" step="1" />
+                            <label asp-for="ScheduledClass.Capacity" class="form-label">Capacity</label>
+                            <span asp-validation-for="ScheduledClass.Capacity" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-1">
+                            <button id="scheduled-class-submit" type="submit" class="w-100 btn btn-lg btn-green"><i class="fa fa-file" aria-hidden="true"></i> Update Scheduled Class</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/js/scheduledClassFormHandler.js"></script>
+}

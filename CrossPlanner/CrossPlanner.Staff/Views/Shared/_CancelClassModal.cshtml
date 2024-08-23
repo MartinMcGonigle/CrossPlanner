@@ -1,0 +1,27 @@
+﻿@model int
+
+<div class="modal fade" id="cancelModal-@Model" tabindex="-1" aria-labelledby="cancelModalLabel-@Model" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelModalLabel-@Model">Cancel Class</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="cancelClassForm-@Model" method="post">
+                    <input type="hidden" name="ScheduledClassId" value="@Model" />
+
+                    <div class="mb-3">
+                        <label for="cancellationReason-@Model" class="form-label">Cancellation Reason</label>
+                        <textarea class="form-control" id="cancellationReason-@Model" name="CancellationReason" rows="3" required></textarea>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-danger">Cancel Class</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

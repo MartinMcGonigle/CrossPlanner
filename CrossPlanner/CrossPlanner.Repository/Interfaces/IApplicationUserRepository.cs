@@ -12,5 +12,7 @@ namespace CrossPlanner.Repository.Interfaces
         public IEnumerable<AffiliateUsersViewModel> GetAffiliateUsers(string q, int affiliateId, int page, int pageSize, string linkedToGymSearch, string emailConfirmedSearch, string activeMembershipSearch, string roleSearch);
 
         public int GetAffiliateUsersCount(string q, int affiliateId, string linkedToGymSearch, string emailConfirmedSearch, string activeMembershipSearch, string roleSearch);
+
+        public IEnumerable<ApplicationUser> GetAffiliateActiveStaff(int affiliateId);
     }
 }

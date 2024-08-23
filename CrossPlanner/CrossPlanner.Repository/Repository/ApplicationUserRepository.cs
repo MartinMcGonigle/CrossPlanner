@@ -1,5 +1,4 @@
-﻿using Azure;
-using CrossPlanner.Domain.Context;
+﻿using CrossPlanner.Domain.Context;
 using CrossPlanner.Domain.Models;
 using CrossPlanner.Domain.OtherModels;
 using CrossPlanner.Repository.Interfaces;
@@ -112,6 +111,28 @@ namespace CrossPlanner.Repository.Repository
             catch (Exception ex)
             {
                 throw ex;
+            }
+            finally
+            {
+                if (connection.State == ConnectionState.Open)
+                {
+                    connection.Close();
+                }
+            }
+        }
+
+        public IEnumerable<ApplicationUser> GetAffiliateActiveStaff(int affiliateId)
+        {
+            var connection = new SqlConnection(_applicationContext.Database.GetDbConnection().ConnectionString);
+
+            try
+            {
+                connection.Open();
+                var dynamicParameters = new DynamicParameters();
+                dynamicParameters.Add("affiliateId", affiliateId);
+                var data = connection.Query<ApplicationUser>("spSelectAffiliateActiveStaff", dynamicParameters, commandType: CommandType.StoredProcedure);
+
+                return data;
             }
             finally
             {

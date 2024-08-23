@@ -150,6 +150,21 @@ namespace CrossPlanner.Repository.Wrapper
             }
         }
 
+        private IScheduledClassRepository _scheduledClassRepository;
+
+        public IScheduledClassRepository ScheduledClassRepository
+        {
+            get
+            {
+                if (_scheduledClassRepository == null)
+                {
+                    _scheduledClassRepository = new ScheduledClassRepository(_applicationContext);
+                }
+
+                return _scheduledClassRepository;
+            }
+        }
+
         public void Save()
         {
             _applicationContext.SaveChanges();

@@ -10,5 +10,14 @@ namespace CrossPlanner.Repository.Repository
         {
             
         }
+
+        public List<ClassType> GetAffiliateActiveClassTypes(int affiliateId)
+        {
+            var data = _applicationContext.ClassTypes.Where(ct => ct.IsActive
+            && !ct.IsDeleted
+            && ct.AffiliateId == affiliateId);
+
+            return data.ToList();
+        }
     }
 }

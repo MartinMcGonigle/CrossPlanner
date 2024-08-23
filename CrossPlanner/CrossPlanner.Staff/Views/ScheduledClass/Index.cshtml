@@ -1,0 +1,99 @@
+﻿@model DailyScheduleViewModel
+@{
+    ViewData["Title"] = "Classes";
+}
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <a class="btn btn-secondary" asp-action="Create"><i class="fas fa-circle-plus" aria-hidden="true"></i> Create Scheduled Class </a>
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible mb-3" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        @TempData["ErrorMessage"]
+    </div>
+    <br />
+}
+
+<div class="container">
+    <div class="row my-3">
+
+        <div class="col text-start">
+            <a asp-action="Index" asp-route-date="@Model.SelectedDate.AddDays(-1).ToString("yyyy-MM-dd")" class="btn btn-secondary">
+                <i class="fas fa-chevron-left" aria-hidden="true"></i>
+            </a>
+        </div>
+
+        <div class="col text-center">
+            <h3>@Model.SelectedDate.ToShortDateString()</h3>
+        </div>
+
+        <div class="col text-end">
+            <a asp-action="Index" asp-route-date="@Model.SelectedDate.AddDays(1).ToString("yyyy-MM-dd")" class="btn btn-secondary">
+                <i class="fas fa-chevron-right" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
+    
+    @if (Model.ScheduledClasses.Any())
+    {
+        <div class="list-group">
+            @foreach (var sc in Model.ScheduledClasses)
+            {
+                <div class="list-group-item mb-4 shadow-lg @(sc.IsCancelled ? "canceled-class" : "") @(!sc.IsActive ? "inactive-class": "")">
+
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">@sc.ClassType.Title</h5>
+                        <small>@sc.StartDateTime.ToString("h:mm tt") - @sc.EndDateTime.ToString("h:mm tt")</small>
+                    </div>
+                    <p class="mb-1">Instructor: @sc.Instructor.FirstName @sc.Instructor.LastName</p>
+                    <small class="text-muted">@sc.Capacity?.ToString() ?? "Unlimited" / 20 slots available</small>
+
+                    <div class="d-flex justify-content-end mt-2">
+                        @if (sc.IsCancelled)
+                        {
+                            <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#cancelReasonModal-@sc.ScheduledClassId">
+                                <i class="fas fa-info-circle" aria-hidden="true"></i> View Reason
+                            </button>
+
+                            @await Html.PartialAsync("_CancelClassReasonModal", sc);
+                        }
+                        else if (DateTime.Now < sc.StartDateTime && !sc.IsCancelled)
+                        {
+                            <a asp-action="Edit" asp-route-scheduledClassId="@sc.ScheduledClassId" class="btn btn-warning btn-sm mx-2">
+                                <i class="fas fa-edit" aria-hidden="true"></i> Edit
+                            </a>
+
+                            <button data-id="@sc.ScheduledClassId" class="btn btn-sm toggle-scheduled-class  @(sc.IsActive ? "btn-green" : "btn-warning")">
+                                <i class="fa @(sc.IsActive ? "fa-toggle-off" : "fa-toggle-on")" aria-hidden="true"></i>
+                                @(sc.IsActive ? "Deactivate Class" : "Reactivate Class")
+                            </button>
+
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#cancelModal-@sc.ScheduledClassId">
+                                <i class="fas fa-times" aria-hidden="true"></i> Cancel
+                            </button>
+
+                            @await Html.PartialAsync("_CancelClassModal", sc.ScheduledClassId)
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info mt-4 text-center">
+            <h4 class="alert-heading">No Classes Available</h4>
+            <p>There are no classes scheduled for @Model.SelectedDate.ToShortDateString()</p>
+        </div>
+    }
+</div>
+
+<partial name="_FeedbackModal" />
+
+@section Scripts {
+    <script src="~/js/scheduledClassManagement.js"></script>
+}
