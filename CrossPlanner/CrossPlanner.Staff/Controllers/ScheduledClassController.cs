@@ -148,7 +148,7 @@ namespace CrossPlanner.Staff.Controllers
                 _logger.LogInformation($"{logPrefix} - Attempting to edit scheduled class with id {viewModel.ScheduledClass.ScheduledClassId}");
 
                 scheduledClass.ClassTypeId = viewModel.ScheduledClass.ClassTypeId;
-                scheduledClass.InstructorId = viewModel.ScheduledClass.InstructorId;
+               // scheduledClass.InstructorId = viewModel.ScheduledClass.InstructorId;
                 scheduledClass.StartDateTime = viewModel.ScheduledClass.StartDateTime;
                 scheduledClass.EndDateTime = viewModel.ScheduledClass.EndDateTime;
                 scheduledClass.Capacity = viewModel.ScheduledClass.Capacity;

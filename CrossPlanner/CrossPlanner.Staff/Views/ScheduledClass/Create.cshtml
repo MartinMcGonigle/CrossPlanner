@@ -31,7 +31,7 @@
                             <label asp-for="ScheduledClass.ClassTypeId" class="form-label">Class Type <span class="required">*</span></label>
                             <span asp-validation-for="ScheduledClass.ClassTypeId" class="text-danger"></span>
                         </div>
-
+                        
                         <div class="form-floating mb-3">
                             <select asp-for="ScheduledClass.InstructorId" id="instructor-id" class="form-control" aria-required="true">
                                 <option disabled selected value="">-- Select Instructor --</option>
@@ -43,7 +43,7 @@
                             <label asp-for="ScheduledClass.InstructorId" class="form-label">Instructor <span class="required">*</span></label>
                             <span asp-validation-for="ScheduledClass.InstructorId" class="text-danger"></span>
                         </div>
-
+                        
                         <div class="form-floating mb-3">
                             <input asp-for="ScheduledClass.StartDateTime" id="start-date-time" class="form-control" aria-required="true" type="datetime-local" min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
                             <label asp-for="ScheduledClass.StartDateTime" class="form-label">Start Date Time <span class="required">*</span></label>

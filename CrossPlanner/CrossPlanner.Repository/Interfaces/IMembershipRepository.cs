@@ -10,5 +10,7 @@ namespace CrossPlanner.Repository.Interfaces
         public int GetAffiliateMembershipsCount(string q, int affiliateId, int page, int pageSize);
 
         public IEnumerable<Membership> GetUserMemberships(int affiliateId, string memberId);
+
+        public Membership? GetMembershipByAffiliateMemberId(int affiliateId, string memberId);
     }
 }

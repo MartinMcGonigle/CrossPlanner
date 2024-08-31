@@ -11,7 +11,7 @@ namespace CrossPlanner.Domain.Models
 
         [Required]
         public int ClassTypeId { get; set; }
-
+        
         [Required]
         public string InstructorId { get; set; }
 
@@ -34,8 +34,11 @@ namespace CrossPlanner.Domain.Models
 
         [ForeignKey("ClassTypeId")]
         public ClassType? ClassType { get; set; }
-
+        
         [ForeignKey("InstructorId")]
         public ApplicationUser? Instructor {  get; set; }
+
+        [NotMapped]
+        public int ReservationsCount { get; set; }
     }
 }

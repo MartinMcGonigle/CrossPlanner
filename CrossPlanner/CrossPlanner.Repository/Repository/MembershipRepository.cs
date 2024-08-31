@@ -90,5 +90,16 @@ namespace CrossPlanner.Repository.Repository
                 .OrderByDescending(m => m.StartDate )
                 .ToList();
         }
+
+        public Membership? GetMembershipByAffiliateMemberId(int affiliateId, string memberId)
+        {
+            return _applicationContext.Memberships
+                .Where(
+                m => m.MemberId == memberId
+                && m.IsActive
+                && m.MembershipPlan.AffiliateId == affiliateId)
+                .Include(m => m.MembershipPlan)
+                .FirstOrDefault();
+        }
     }
 }

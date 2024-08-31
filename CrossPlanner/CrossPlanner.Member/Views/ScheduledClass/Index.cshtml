@@ -1,0 +1,79 @@
+﻿@model DailyScheduleViewModel
+@{
+    ViewData["Title"] = "Classes";
+}
+
+@if (TempData["MembershipMessage"] != null)
+{
+    <div class="alert alert-warning" role="alert">
+        @TempData["MembershipMessage"]
+    </div>
+}
+
+<div class="container">
+    <div class="row my-3">
+        <div class="col text-start">
+            <a asp-action="Index" asp-route-date="@Model.SelectedDate.AddDays(-1).ToString("yyyy-MM-dd")" class="btn btn-secondary">
+                <i class="fas fa-chevron-left" aria-hidden="true"></i>
+            </a>
+        </div>
+
+        <div class="col text-center">
+            <h3>@Model.SelectedDate.ToString("dddd, MMMM d")</h3>
+        </div>
+
+        <div class="col text-end">
+            <a asp-action="Index" asp-route-date="@Model.SelectedDate.AddDays(1).ToString("yyyy-MM-dd")" class="btn btn-secondary">
+                <i class="fas fa-chevron-right" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
+
+    @if (Model.ScheduledClassDetails.Any())
+    {
+        <div class="list-group">
+            @foreach (var scd in Model.ScheduledClassDetails)
+            {
+                <div class="list-group-item mb-4 shadow-lg">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">@scd.ClassTypeTitle</h5>
+                        <small>@scd.StartDateTime.ToString("h:mm tt") - @scd.EndDateTime.ToString("h:mm tt")</small>
+                    </div>
+                    <p class="mb-1">Instructor: @scd.InstructorFirstName @scd.InstructorLastName</p>
+                    <small class="text-muted">@scd.ReservationsCount / @(scd.Capacity == null ? "Unlimited" : scd.Capacity.ToString())</small>
+
+                    <div class="d-flex justify-content-end mt-2">
+                        @if (TempData["MembershipMessage"] == null && DateTime.Now < scd.StartDateTime && !scd.IsCancelled && !scd.Reserved && (scd.Capacity == null ? true : scd.ReservationsCount < scd.Capacity))
+                        {
+                            <button data-id="@scd.ScheduledClassId" class="btn btn-success reserve-scheduled-class">
+                                <i class="fa fa-calendar-plus" aria-hidden="true"></i>
+                                Reserve
+                            </button>
+                        }
+
+                        @if (TempData["MembershipMessage"] == null && DateTime.Now < scd.StartDateTime && !scd.IsCancelled && scd.Reserved)
+                        {
+                            <button data-id="@scd.ScheduledClassReservationId" class="btn btn-danger remove-reservation-scheduled-class">
+                                <i class="fa fa-times-circle" aria-hidden="true"></i>
+                                Remove Reservation
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info mt-4 text-center">
+            <h4 class="alert-heading">No Classes Available</h4>
+            <p>There are no classes scheduled for @Model.SelectedDate.ToShortDateString()</p>
+        </div>
+    }
+</div>
+
+<partial name="_FeedbackModal" />
+
+@section Scripts {
+    <script src="~/js/scheduledClassManagement.js"></script>
+}
