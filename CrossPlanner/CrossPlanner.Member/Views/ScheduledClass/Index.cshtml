@@ -34,7 +34,7 @@
         <div class="list-group">
             @foreach (var scd in Model.ScheduledClassDetails)
             {
-                <div class="list-group-item mb-4 shadow-lg">
+                <div class="list-group-item mb-4 shadow-lg @(scd.IsCancelled ? "canceled-class" : "")">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="mb-1">@scd.ClassTypeTitle</h5>
                         <small>@scd.StartDateTime.ToString("h:mm tt") - @scd.EndDateTime.ToString("h:mm tt")</small>
@@ -43,15 +43,22 @@
                     <small class="text-muted">@scd.ReservationsCount / @(scd.Capacity == null ? "Unlimited" : scd.Capacity.ToString())</small>
 
                     <div class="d-flex justify-content-end mt-2">
-                        @if (TempData["MembershipMessage"] == null && DateTime.Now < scd.StartDateTime && !scd.IsCancelled && !scd.Reserved && (scd.Capacity == null ? true : scd.ReservationsCount < scd.Capacity))
+                        @if (scd.IsCancelled)
+                        {
+                            
+                            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#cancelReasonModal-@scd.ScheduledClassId">
+                                <i class="fas fa-info-circle" aria-hidden="true"></i> View Reason
+                            </button>
+                            @await Html.PartialAsync("_CancelClassReasonModal", scd);
+                        }
+                        else if (TempData["MembershipMessage"] == null && DateTime.Now < scd.StartDateTime && !scd.IsCancelled && !scd.Reserved && (scd.Capacity == null ? true : scd.ReservationsCount < scd.Capacity))
                         {
                             <button data-id="@scd.ScheduledClassId" class="btn btn-success reserve-scheduled-class">
                                 <i class="fa fa-calendar-plus" aria-hidden="true"></i>
                                 Reserve
                             </button>
                         }
-
-                        @if (TempData["MembershipMessage"] == null && DateTime.Now < scd.StartDateTime && !scd.IsCancelled && scd.Reserved)
+                        else if (TempData["MembershipMessage"] == null && DateTime.Now < scd.StartDateTime && !scd.IsCancelled && scd.Reserved)
                         {
                             <button data-id="@scd.ScheduledClassReservationId" class="btn btn-danger remove-reservation-scheduled-class">
                                 <i class="fa fa-times-circle" aria-hidden="true"></i>
