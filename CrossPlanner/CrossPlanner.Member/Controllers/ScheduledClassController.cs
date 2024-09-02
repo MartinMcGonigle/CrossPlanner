@@ -60,6 +60,32 @@ namespace CrossPlanner.Member.Controllers
             return View(viewModel);
         }
 
+        [HttpGet]
+        public IActionResult WhosComing(int scheduledClassId)
+        {
+            _logger.LogInformation($"{logPrefix} - Attempting to display who's coming to scheduled class with id {scheduledClassId}");
+
+            var scheduledClass = _repositoryWrapper.ScheduledClassRepository.GetScheduledClassById(scheduledClassId);
+            if (scheduledClass == null)
+            {
+                _logger.LogWarning($"{logPrefix} - Scheduled class with id {scheduledClassId} not found.");
+                return NotFound();
+            }
+
+            var attendees = _repositoryWrapper.ScheduledClassReservationRepository.GetClassAttendeesByScheduledClassId(scheduledClassId);
+
+            var viewModel = new WhosComingViewModel
+            {
+                ScheduledClassId = scheduledClassId,
+                ClassName = scheduledClass.ClassType.Title,
+                StartDateTime = scheduledClass.StartDateTime,
+                EndDateTime = scheduledClass.EndDateTime,
+                Attendees = attendees
+            };
+
+            return View(viewModel);
+        }
+
         [HttpPost]
         public async Task<IActionResult> ReserveScheduledClass(int scheduledClassId)
         {
@@ -84,7 +110,7 @@ namespace CrossPlanner.Member.Controllers
                     return Json(new { message = "You do not have an active membership." });
                 }
                 
-                var scheduledClass = _repositoryWrapper.ScheduledClassRepository.GetScheduledClassById(scheduledClassId);
+                var scheduledClass = _repositoryWrapper.ScheduledClassRepository.GetScheduledClassByIdSP(scheduledClassId);
                 if (scheduledClass == null)
                 {
                     _logger.LogWarning($"{logPrefix} - Unable to reserve scheduled class with id {scheduledClassId} as could not be found.");

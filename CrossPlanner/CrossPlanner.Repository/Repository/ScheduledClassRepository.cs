@@ -62,7 +62,7 @@ namespace CrossPlanner.Repository.Repository
 
 
 
-        public ScheduledClass? GetScheduledClassById(int scheduledClassId)
+        public ScheduledClass? GetScheduledClassByIdSP(int scheduledClassId)
         {
             using (var connection = new SqlConnection(_applicationContext.Database.GetDbConnection().ConnectionString))
             {
@@ -82,5 +82,14 @@ namespace CrossPlanner.Repository.Repository
             }
         }
 
+        public ScheduledClass? GetScheduledClassById(int scheduledClassId)
+        {
+            var scheduledClass = _applicationContext.ScheduledClasses.
+                Where(sc => sc.ScheduledClassId == scheduledClassId)
+                .Include(sc => sc.ClassType)
+                .FirstOrDefault();
+
+            return scheduledClass;
+        }
     }
 }

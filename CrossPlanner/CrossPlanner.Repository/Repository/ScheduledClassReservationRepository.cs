@@ -1,5 +1,6 @@
 ﻿using CrossPlanner.Domain.Context;
 using CrossPlanner.Domain.Models;
+using CrossPlanner.Domain.OtherModels;
 using CrossPlanner.Repository.Interfaces;
 using Dapper;
 using Microsoft.Data.SqlClient;
@@ -50,6 +51,21 @@ namespace CrossPlanner.Repository.Repository
                 && scr.ScheduledClass.StartDateTime >= startOfWeek
                 && scr.ScheduledClass.EndDateTime <= endOfWeek)
                 .Count();
+        }
+
+        public List<ClassAttendeeViewModel> GetClassAttendeesByScheduledClassId(int scheduledClassId)
+        {
+            var attendees = _applicationContext.ScheduledClassReservations
+                .Where(scr => scr.ScheduledClassId == scheduledClassId)
+                .Include(scr => scr.Membership)
+                .ThenInclude(m => m.Member)
+                .Select(scr => new ClassAttendeeViewModel
+                {
+                    Name = $"{scr.Membership.Member.FirstName} {scr.Membership.Member.LastName}"
+                })
+                .ToList();
+
+            return attendees;
         }
     }
 }
