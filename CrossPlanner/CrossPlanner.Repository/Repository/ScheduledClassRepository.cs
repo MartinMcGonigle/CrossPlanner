@@ -60,6 +60,33 @@ namespace CrossPlanner.Repository.Repository
             }
         }
 
+        public IEnumerable<ScheduledClassDetail> GetAffiliateScheduledClassByDateStaff(int affiliateId, DateTime dateTime)
+        {
+            var connection = new SqlConnection(_applicationContext.Database.GetDbConnection().ConnectionString);
+
+            try
+            {
+                connection.Open();
+                var dynamicParameters = new DynamicParameters();
+                dynamicParameters.Add("affiliateId", affiliateId);
+                dynamicParameters.Add("dateTime", dateTime);
+                var data = connection.Query<ScheduledClassDetail>("spSelectAffiliateScheduledClassByDateStaff", dynamicParameters, commandType: CommandType.StoredProcedure);
+
+                return data;
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (connection.State == ConnectionState.Open)
+                {
+                    connection.Close();
+                }
+            }
+        }
+
 
 
         public ScheduledClass? GetScheduledClassByIdSP(int scheduledClassId)

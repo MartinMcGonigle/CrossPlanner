@@ -153,7 +153,31 @@ h3 {
     opacity: 0.7; /* Make it slightly transparent */
 }
 
+.profile-picture {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    margin: 0 auto;
+}
 
+.whos-coming-card {
+    border: none;
+    border-radius: 10px;
+}
+
+.whos-coming-card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.whos-coming-card:hover {
+    transform: translateY(-5px);
+    transition: transform 0.2s ease-in-out;
+}
+
+    .whos-coming-card:hover .whos-coming-card-title {
+        color: #dc3545; /* Optional: Change the text color on hover */
+    }
 
 
 

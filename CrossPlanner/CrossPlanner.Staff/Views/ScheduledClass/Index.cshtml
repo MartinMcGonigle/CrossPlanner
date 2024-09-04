@@ -28,7 +28,7 @@
         </div>
 
         <div class="col text-center">
-            <h3>@Model.SelectedDate.ToShortDateString()</h3>
+            <h3>@Model.SelectedDate.ToString("dddd, MMMM d")</h3>
         </div>
 
         <div class="col text-end">
@@ -38,46 +38,47 @@
         </div>
     </div>
     
-    @if (Model.ScheduledClasses.Any())
+    @if (Model.ScheduledClassDetails.Any())
     {
         <div class="list-group">
-            @foreach (var sc in Model.ScheduledClasses)
+            @foreach (var scd in Model.ScheduledClassDetails)
             {
-                <div class="list-group-item mb-4 shadow-lg @(sc.IsCancelled ? "canceled-class" : "") @(!sc.IsActive ? "inactive-class": "")">
-
+                <div class="list-group-item mb-4 shadow-lg @(scd.IsCancelled ? "canceled-class" : "") @(!scd.IsActive ? "inactive-class": "")">
                     <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">@sc.ClassType.Title</h5>
-                        <small>@sc.StartDateTime.ToString("h:mm tt") - @sc.EndDateTime.ToString("h:mm tt")</small>
+                        <h5 class="mb-1">@scd.ClassTypeTitle</h5>
+                        <small>@scd.StartDateTime.ToString("h:mm tt") - @scd.EndDateTime.ToString("h:mm tt")</small>
                     </div>
-                    <p class="mb-1">Instructor: @sc.Instructor.FirstName @sc.Instructor.LastName</p>
-                    <small class="text-muted">@sc.Capacity?.ToString() ?? "Unlimited" / 20 slots available</small>
+                    <p class="mb-1">Instructor: @scd.InstructorFirstName @scd.InstructorLastName</p>
+                    <small class="text-muted">@scd.ReservationsCount / @(scd.Capacity == null ? "Unlimited" : scd.Capacity.ToString())</small>
 
                     <div class="d-flex justify-content-end mt-2">
-                        @if (sc.IsCancelled)
+                        @if (scd.IsCancelled)
                         {
-                            <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#cancelReasonModal-@sc.ScheduledClassId">
+                            <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#cancelReasonModal-@scd.ScheduledClassId">
                                 <i class="fas fa-info-circle" aria-hidden="true"></i> View Reason
                             </button>
 
-                            @await Html.PartialAsync("_CancelClassReasonModal", sc);
+                            @await Html.PartialAsync("_CancelClassReasonModal", scd);
                         }
-                        else if (DateTime.Now < sc.StartDateTime && !sc.IsCancelled)
+                        else if (DateTime.Now < scd.StartDateTime && !scd.IsCancelled)
                         {
-                            <a asp-action="Edit" asp-route-scheduledClassId="@sc.ScheduledClassId" class="btn btn-warning btn-sm mx-2">
+                            <a asp-action="Edit" asp-route-scheduledClassId="@scd.ScheduledClassId" class="btn btn-warning btn-sm mx-2">
                                 <i class="fas fa-edit" aria-hidden="true"></i> Edit
                             </a>
 
-                            <button data-id="@sc.ScheduledClassId" class="btn btn-sm toggle-scheduled-class  @(sc.IsActive ? "btn-green" : "btn-warning")">
-                                <i class="fa @(sc.IsActive ? "fa-toggle-off" : "fa-toggle-on")" aria-hidden="true"></i>
-                                @(sc.IsActive ? "Deactivate Class" : "Reactivate Class")
+                            <button data-id="@scd.ScheduledClassId" class="btn btn-sm toggle-scheduled-class  @(scd.IsActive ? "btn-green" : "btn-warning")">
+                                <i class="fa @(scd.IsActive ? "fa-toggle-off" : "fa-toggle-on")" aria-hidden="true"></i>
+                                @(scd.IsActive ? "Deactivate Class" : "Reactivate Class")
                             </button>
 
-                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#cancelModal-@sc.ScheduledClassId">
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#cancelModal-@scd.ScheduledClassId">
                                 <i class="fas fa-times" aria-hidden="true"></i> Cancel
                             </button>
 
-                            @await Html.PartialAsync("_CancelClassModal", sc.ScheduledClassId)
+                            @await Html.PartialAsync("_CancelClassModal", scd.ScheduledClassId)
                         }
+
+                        <a class="btn btn-primary" asp-action="WhosComing" asp-route-scheduledClassId="@scd.ScheduledClassId"><i class="fas fa-eye" aria-hidden="true"></i> Who's Coming</a>
                     </div>
                 </div>
             }

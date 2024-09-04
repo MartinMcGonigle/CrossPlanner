@@ -61,7 +61,9 @@ namespace CrossPlanner.Repository.Repository
                 .ThenInclude(m => m.Member)
                 .Select(scr => new ClassAttendeeViewModel
                 {
-                    Name = $"{scr.Membership.Member.FirstName} {scr.Membership.Member.LastName}"
+                    Name = $"{scr.Membership.Member.FirstName} {scr.Membership.Member.LastName}",
+                    IsPresent = scr.IsPresent,
+                    ScheduledClassReservationId = scr.ScheduledClassReservationId
                 })
                 .ToList();
 

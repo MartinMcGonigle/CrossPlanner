@@ -14,31 +14,67 @@ namespace CrossPlanner.Staff.Controllers
         private readonly IRepositoryWrapper _repositoryWrapper;
         private const string logPrefix = "Ctlr|ScheduledClass";
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
         public ScheduledClassController(
             ILogger<ScheduledClassController> logger,
             IRepositoryWrapper repositoryWrapper,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager)
         {
             _logger = logger;
             _repositoryWrapper = repositoryWrapper;
             _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         [HttpGet]
-        public IActionResult Index(DateTime? date)
+        public async Task<IActionResult> Index(DateTime? date)
         {
             Int32.TryParse(User.FindFirst("Affiliate")?.Value, out int affiliateId);
             var selectedDate = date ?? DateTime.Today;
 
+            if (affiliateId == 0)
+            {
+                _logger.LogWarning($"{logPrefix} - Redirecting user to login page as affiliateId was {affiliateId}");
+                await _signInManager.SignOutAsync();
+                return RedirectToPage("/Account/Login", new { area = "Identity" });
+            }
+
             _logger.LogInformation($"{logPrefix} - Attempting to display scheduled classes for affiliate with id {affiliateId} on {selectedDate.ToShortDateString()}");
 
-            var scheduledClasses = _repositoryWrapper.ScheduledClassRepository.GetAffiliateScheduledClassByDate(affiliateId, selectedDate);
+            var scheduledClassDetails = _repositoryWrapper.ScheduledClassRepository.GetAffiliateScheduledClassByDateStaff(affiliateId, selectedDate);
 
             var viewModel = new DailyScheduleViewModel
             {
                 SelectedDate = selectedDate,
-                ScheduledClasses = scheduledClasses
+                ScheduledClassDetails = scheduledClassDetails.ToList()
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpGet]
+        public IActionResult WhosComing(int scheduledClassId)
+        {
+            _logger.LogInformation($"{logPrefix} - Attempting to display who's coming to scheduled class with id {scheduledClassId}");
+
+            var scheduledClass = _repositoryWrapper.ScheduledClassRepository.GetScheduledClassById(scheduledClassId);
+            if (scheduledClass == null)
+            {
+                _logger.LogWarning($"{logPrefix} - Scheduled class with id {scheduledClassId} not found.");
+                return NotFound();
+            }
+
+            var attendees = _repositoryWrapper.ScheduledClassReservationRepository.GetClassAttendeesByScheduledClassId(scheduledClassId);
+
+            var viewModel = new WhosComingViewModel
+            {
+                ScheduledClassId = scheduledClassId,
+                ClassName = scheduledClass.ClassType.Title,
+                StartDateTime = scheduledClass.StartDateTime,
+                EndDateTime = scheduledClass.EndDateTime,
+                Attendees = attendees
             };
 
             return View(viewModel);
@@ -218,12 +254,75 @@ namespace CrossPlanner.Staff.Controllers
             }
         }
 
+        [HttpPut]
+        public async Task<IActionResult> MarkAbsent(int scheduledClassReservationId)
+        {
+            _logger.LogInformation($"{logPrefix} - Attempting to mark class reservation {scheduledClassReservationId} as absent");
+
+            var scheduledClassReservation = GetScheduledClassReservationById(scheduledClassReservationId);
+            if (scheduledClassReservation == null)
+            {
+                _logger.LogWarning($"{logPrefix} - Unable to mark class reservation {scheduledClassReservationId} as absent because it could not be found");
+                return Json(new { message = "Class reservation not found." });
+            }
+
+            try
+            {
+                scheduledClassReservation.IsPresent = false;
+                _repositoryWrapper.ScheduledClassReservationRepository.Update(scheduledClassReservation);
+                await _repositoryWrapper.SaveAsync();
+
+                return Json(new { message = "Class reservation marked as absent." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{logPrefix} - An error occurred whilst attempting to mark class reservation as absent {scheduledClassReservationId}: {ex}");
+                return Json(new { message = "An error occurred while marking class reservation as absent." });
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> MarkPresent(int scheduledClassReservationId)
+        {
+            _logger.LogInformation($"{logPrefix} - Attempting to mark class reservation {scheduledClassReservationId} as present");
+
+            var scheduledClassReservation = GetScheduledClassReservationById(scheduledClassReservationId);
+            if (scheduledClassReservation == null)
+            {
+                _logger.LogWarning($"{logPrefix} - Unable to mark class reservation {scheduledClassReservationId} as present because it could not be found");
+                return Json(new { message = "Class reservation not found." });
+            }
+
+            try
+            {
+                scheduledClassReservation.IsPresent = true;
+                _repositoryWrapper.ScheduledClassReservationRepository.Update(scheduledClassReservation);
+                await _repositoryWrapper.SaveAsync();
+
+                return Json(new { message = "Class reservation marked as present." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{logPrefix} - An error occurred whilst attempting to mark class reservation as present {scheduledClassReservationId}: {ex}");
+                return Json(new { message = "An error occurred while marking class reservation as present." });
+            }
+        }
+
+        private ScheduledClassReservation GetScheduledClassReservationById(int scheduledClassReservationId)
+        {
+            return _repositoryWrapper.ScheduledClassReservationRepository
+                .FindByCondition(scr => scr.ScheduledClassReservationId == scheduledClassReservationId)
+                .FirstOrDefault();
+        }
+
         private ScheduledClass GetScheduledClassById(int scheduledClassId)
         {
             return _repositoryWrapper.ScheduledClassRepository
                 .FindByCondition(sc => sc.ScheduledClassId == scheduledClassId)
                 .FirstOrDefault();
         }
+
+
 
     }
 }

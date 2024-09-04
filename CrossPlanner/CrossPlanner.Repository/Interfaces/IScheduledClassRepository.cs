@@ -9,6 +9,8 @@ namespace CrossPlanner.Repository.Interfaces
 
         public IEnumerable<ScheduledClassDetail> GetAffiliateScheduledClassByDateMember(int affiliateId, DateTime dateTime, string memberId);
 
+        public IEnumerable<ScheduledClassDetail> GetAffiliateScheduledClassByDateStaff(int affiliateId, DateTime dateTime);
+
         public ScheduledClass? GetScheduledClassByIdSP(int scheduledClassId);
 
         public ScheduledClass? GetScheduledClassById(int scheduledClassId);
