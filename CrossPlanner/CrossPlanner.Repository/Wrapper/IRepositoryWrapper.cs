@@ -27,6 +27,12 @@ namespace CrossPlanner.Repository.Wrapper
 
         IScheduledClassReservationRepository ScheduledClassReservationRepository { get; }
 
+        IWorkoutRepository WorkoutRepository { get; }
+
+        IClassTypeWorkoutRepository ClassTypeWorkoutRepository { get; }
+
+        IScheduledClassWorkoutRepository ScheduledClassWorkoutRepository { get; }
+
         void Save();
 
         Task SaveAsync();

@@ -180,6 +180,51 @@ namespace CrossPlanner.Repository.Wrapper
             }
         }
 
+        private IWorkoutRepository _workoutRepository;
+
+        public IWorkoutRepository WorkoutRepository
+        {
+            get
+            {
+                if (_workoutRepository == null)
+                {
+                    _workoutRepository = new WorkoutRepository(_applicationContext);
+                }
+
+                return _workoutRepository;
+            }
+        }
+
+        private IClassTypeWorkoutRepository _classTypeWorkoutRepository;
+
+        public IClassTypeWorkoutRepository ClassTypeWorkoutRepository
+        {
+            get
+            {
+                if (_classTypeWorkoutRepository == null)
+                {
+                    _classTypeWorkoutRepository = new ClassTypeWorkoutRepository(_applicationContext);
+                }
+
+                return _classTypeWorkoutRepository;
+            }
+        }
+
+        private IScheduledClassWorkoutRepository _scheduledClassWorkoutRepository;
+
+        public IScheduledClassWorkoutRepository ScheduledClassWorkoutRepository
+        {
+            get
+            {
+                if (_scheduledClassWorkoutRepository == null)
+                {
+                    _scheduledClassWorkoutRepository = new ScheduledClassWorkoutRepository(_applicationContext);
+                }
+
+                return _scheduledClassWorkoutRepository;
+            }
+        }
+
         public void Save()
         {
             _applicationContext.SaveChanges();

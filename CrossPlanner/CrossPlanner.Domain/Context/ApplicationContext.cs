@@ -33,6 +33,12 @@ namespace CrossPlanner.Domain.Context
         
         public DbSet<ScheduledClassReservation> ScheduledClassReservations { get; set; }
 
+        public DbSet<Workout> Workouts { get; set; }
+
+        public DbSet<ClassTypeWorkout> ClassTypeWorkouts { get; set; }
+
+        public DbSet<ScheduledClassWorkout> ScheduledClassWorkouts { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
