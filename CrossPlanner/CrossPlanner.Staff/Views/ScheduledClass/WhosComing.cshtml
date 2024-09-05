@@ -3,7 +3,9 @@
     ViewData["Title"] = "Who's Coming";
 }
 
-
+<button id="add-attendee" data-id="@Model.ScheduledClassId" class="btn btn-primary">
+    <i class="fas fa-plus" aria-hidden="true"></i> Add Attendee
+</button>
 
 @if (Model.Attendees.Any())
 {
@@ -53,6 +55,7 @@ else
 }
 
 <partial name="_FeedbackModal" />
+<partial name="_UserSelectionModal" />
 
 @section Scripts {
     <script src="~/js/whosComing.js"></script>

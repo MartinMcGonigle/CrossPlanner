@@ -4,6 +4,7 @@ using CrossPlanner.Repository.Wrapper;
 using Microsoft.AspNetCore.Identity;
 using CrossPlanner.Domain.Models;
 using CrossPlanner.Domain.OtherModels;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CrossPlanner.Staff.Controllers
 {
@@ -308,6 +309,93 @@ namespace CrossPlanner.Staff.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetUnreservedMembers (int scheduledClassId)
+        {
+            try
+            {
+                Int32.TryParse(User.FindFirst("Affiliate")?.Value, out int affiliateId);
+
+                if (affiliateId == 0)
+                {
+                    _logger.LogWarning($"{logPrefix} - Redirecting user to login page as affiliateId was {affiliateId}");
+                    await _signInManager.SignOutAsync();
+                    return RedirectToPage("/Account/Login", new { area = "Identity" });
+                }
+
+                var reservedMemberIds = GetReservedMemberIds(scheduledClassId);
+                
+                var unreservedMembers = _repositoryWrapper.MembershipRepository
+                    .FindByCondition(m => m.IsActive && m.MembershipPlan.AffiliateId == affiliateId && !reservedMemberIds.Contains(m.MemberId))
+                    .Select(m => new
+                    {
+                        m.MemberId,
+                        m.Member.FirstName,
+                        m.Member.LastName,
+                        m.Member.Email,
+                        m.MembershipId,
+                        scheduledClassId,
+                    })
+                    .ToList();
+
+                return Ok(unreservedMembers);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{logPrefix} - Unable to retrieve unreserved members for class with id {scheduledClassId}: {ex.Message}", ex);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ReserveScheduledClass(int scheduledClassId, int membershipId)
+        {
+            try
+            {
+                _logger.LogInformation($"{logPrefix} - Attempting to add attendee to scheduled class with id {scheduledClassId} with membership id {membershipId}");
+                
+                var existingMembership = GetMembershipById(membershipId);
+                if (existingMembership == null)
+                {
+                    _logger.LogWarning($"{logPrefix} - Unable to reserve scheduled class with id {scheduledClassId} as could not find membership with id {membershipId}");
+                    return Json(new { message = "Membership not found." });
+                }
+
+                var scheduledClass = GetScheduledClassById(scheduledClassId);
+                if (scheduledClass == null)
+                {
+                    _logger.LogWarning($"{logPrefix} - Unable to reserve scheduled class with id {scheduledClassId} as could not be found.");
+                    return Json(new { message = "Class not found." });
+                }
+
+                var scheduledClassReservation = new ScheduledClassReservation
+                {
+                    MembershipId = membershipId,
+                    ScheduledClassId = scheduledClassId,
+                    ReservationDate = DateTime.Now,
+                    IsPresent = true
+                };
+
+                _repositoryWrapper.ScheduledClassReservationRepository.Create(scheduledClassReservation);
+                await _repositoryWrapper.SaveAsync();
+
+                return Json(new { message = "Scheduled class reserved successfully." });
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError($"{logPrefix} - An error occurred whilst attempting to reserve scheduled class with id {scheduledClassId} for membership id {membershipId}: {ex}");
+                return Json(new { message = "An error occurred while adding reservation." });
+            }
+        }
+
+        private List<string> GetReservedMemberIds(int scheduledClassId)
+        {
+            return _repositoryWrapper.ScheduledClassReservationRepository
+                .FindByCondition(scr => scr.ScheduledClassId == scheduledClassId)
+                .Select(scr => scr.Membership.MemberId)
+                .ToList();
+        }
+
         private ScheduledClassReservation GetScheduledClassReservationById(int scheduledClassReservationId)
         {
             return _repositoryWrapper.ScheduledClassReservationRepository
@@ -322,7 +410,11 @@ namespace CrossPlanner.Staff.Controllers
                 .FirstOrDefault();
         }
 
-
-
+        private Membership? GetMembershipById(int membershipId)
+        {
+            return _repositoryWrapper.MembershipRepository
+                .FindByCondition(m => m.MembershipId == membershipId)
+                .FirstOrDefault();
+        }
     }
 }
