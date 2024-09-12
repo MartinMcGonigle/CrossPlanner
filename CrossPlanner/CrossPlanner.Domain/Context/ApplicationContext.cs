@@ -32,12 +32,8 @@ namespace CrossPlanner.Domain.Context
         public DbSet<ScheduledClass> ScheduledClasses { get; set; }
         
         public DbSet<ScheduledClassReservation> ScheduledClassReservations { get; set; }
-
+        
         public DbSet<Workout> Workouts { get; set; }
-
-        public DbSet<ClassTypeWorkout> ClassTypeWorkouts { get; set; }
-
-        public DbSet<ScheduledClassWorkout> ScheduledClassWorkouts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -55,6 +51,11 @@ namespace CrossPlanner.Domain.Context
                 .HasIndex(au => new { au.ApplicationUserId, au.IsActive })
                 .IsUnique()
                 .HasFilter("[IsActive] = 1");
+            
+            builder.Entity<Workout>()
+                .HasIndex(w => new { w.ClassTypeId, w.Date })
+                .IsUnique()
+                .HasFilter("[IsDeleted] = 0");
         }
     }
 }

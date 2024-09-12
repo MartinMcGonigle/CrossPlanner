@@ -4,7 +4,6 @@ using CrossPlanner.Repository.Wrapper;
 using Microsoft.AspNetCore.Identity;
 using CrossPlanner.Domain.Models;
 using CrossPlanner.Domain.OtherModels;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CrossPlanner.Staff.Controllers
 {

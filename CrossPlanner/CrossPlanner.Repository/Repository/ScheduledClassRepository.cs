@@ -118,5 +118,15 @@ namespace CrossPlanner.Repository.Repository
 
             return scheduledClass;
         }
+
+        public List<ScheduledClass> GetAffiliateScheduledClassInFuture(int affiliateId, DateTime dateTime)
+        {
+            return _applicationContext.ScheduledClasses
+                .Where(sc => sc.ClassType.AffiliateId == affiliateId
+                && sc.StartDateTime > dateTime
+                && sc.IsCancelled == false
+                && sc.IsDeleted == false)
+                .ToList();
+        }
     }
 }

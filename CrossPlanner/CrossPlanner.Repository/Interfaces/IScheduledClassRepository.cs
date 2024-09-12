@@ -14,5 +14,7 @@ namespace CrossPlanner.Repository.Interfaces
         public ScheduledClass? GetScheduledClassByIdSP(int scheduledClassId);
 
         public ScheduledClass? GetScheduledClassById(int scheduledClassId);
+
+        public List<ScheduledClass> GetAffiliateScheduledClassInFuture(int affiliateId, DateTime dateTime);
     }
 }

@@ -195,36 +195,6 @@ namespace CrossPlanner.Repository.Wrapper
             }
         }
 
-        private IClassTypeWorkoutRepository _classTypeWorkoutRepository;
-
-        public IClassTypeWorkoutRepository ClassTypeWorkoutRepository
-        {
-            get
-            {
-                if (_classTypeWorkoutRepository == null)
-                {
-                    _classTypeWorkoutRepository = new ClassTypeWorkoutRepository(_applicationContext);
-                }
-
-                return _classTypeWorkoutRepository;
-            }
-        }
-
-        private IScheduledClassWorkoutRepository _scheduledClassWorkoutRepository;
-
-        public IScheduledClassWorkoutRepository ScheduledClassWorkoutRepository
-        {
-            get
-            {
-                if (_scheduledClassWorkoutRepository == null)
-                {
-                    _scheduledClassWorkoutRepository = new ScheduledClassWorkoutRepository(_applicationContext);
-                }
-
-                return _scheduledClassWorkoutRepository;
-            }
-        }
-
         public void Save()
         {
             _applicationContext.SaveChanges();
