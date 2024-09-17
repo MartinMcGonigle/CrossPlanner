@@ -1,6 +1,7 @@
 ﻿using CrossPlanner.Domain.Models;
 using CrossPlanner.Repository.Wrapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 
@@ -24,10 +25,12 @@ namespace CrossPlanner.Service.Authorisation
         {
             var affiliateUser = _repositoryWrapper.AffiliateUsersRepository
                 .FindByCondition(x => x.ApplicationUserId == user.Id && x.IsActive)
+                .Include(x => x.Affiliate)
                 .FirstOrDefault();
 
             var identity = await base.GenerateClaimsAsync (user);
             identity.AddClaim(new Claim("Affiliate", affiliateUser?.AffiliateId.ToString() ?? ""));
+            identity.AddClaim(new Claim("AffiliateName", affiliateUser?.Affiliate.Name ?? ""));
 
             return identity;
         }

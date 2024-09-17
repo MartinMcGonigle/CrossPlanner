@@ -195,6 +195,21 @@ namespace CrossPlanner.Repository.Wrapper
             }
         }
 
+        private INotificationRepository _notificationRepository;
+
+        public INotificationRepository NotificationRepository
+        {
+            get
+            {
+                if (_notificationRepository == null)
+                {
+                    _notificationRepository = new NotificationRepository(_applicationContext);
+                }
+
+                return _notificationRepository;
+            }
+        }
+
         public void Save()
         {
             _applicationContext.SaveChanges();

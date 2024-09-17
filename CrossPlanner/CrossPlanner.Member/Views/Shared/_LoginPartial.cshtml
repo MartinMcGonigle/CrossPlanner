@@ -2,37 +2,46 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
-<ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
-{
-    <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
-    </li>
-        <li>
-            <a class="nav-link text-dark" asp-controller="Membership" asp-action="MembershipSelection">Membership </a>
-        </li>
+<div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+    <ul class="navbar-nav">
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "ScheduledClass" ? "active" : "")"
+                   asp-controller="ScheduledClass" asp-action="Index">Classes</a>
+            </li>
 
-        <li>
-            <a class="nav-link text-dark" asp-controller="ScheduledClass" asp-action="Index">Scheduled Class </a>
-        </li>
+            <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Workout" ? "active" : "")"
+                   asp-controller="Workout" asp-action="Index">Workouts</a>
+            </li>
 
-        <li>
-            <a class="nav-link text-dark" asp-controller="Workout" asp-action="Index">Workout </a>
-        </li>
+            <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Notification" ? "active" : "")"
+                   asp-controller="Notification" asp-action="Index">Notifications</a>
+            </li>
 
-    <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-        </form>
-    </li>
-}
-else
-{
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
-}
-</ul>
+            <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Membership" ? "active" : "")"
+                   asp-controller="Membership" asp-action="MembershipSelection">Purchase</a>
+            </li>
+
+            <li class="nav-item">
+                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                    <button type="submit" class="nav-link btn btn-link">Logout</button>
+                </form>
+            </li>
+        }
+        else
+        {
+            <li class="nav-item">
+                <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">Register</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Login</a>
+            </li>
+        }
+    </ul>
+
+</div>

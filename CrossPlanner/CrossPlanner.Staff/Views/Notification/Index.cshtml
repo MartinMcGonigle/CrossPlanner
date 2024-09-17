@@ -1,0 +1,47 @@
+﻿@model IEnumerable<Notification>
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <a class="btn btn-secondary" asp-action="Create"><i class="fas fa-circle-plus" aria-hidden="true"></i> Create Notification</a>
+    </div>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="container">
+        @foreach (var notification in Model)
+        {
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="card-title">@notification.Title</h5>
+                    <div class="float-right">
+                        <a asp-action="Edit" class="text-warning" asp-route-notificationId="@notification.NotificationId"><i class="fas fa-edit"></i></a>
+                        
+                        <button data-id="@notification.NotificationId" class="toggle-notification @(notification.IsActive ? "text-success" : "text-light")">
+                            <i class="fa @(notification.IsActive ? "fa-toggle-off" : "fa-toggle-on")" aria-hidden="true"></i>
+                        </button>
+
+                        <button data-id="@notification.NotificationId" class="delete-notification text-danger">
+                            <i class="far fa-trash-alt" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">@Html.Raw(notification.Message)</p>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-info mt-4 text-center">
+        <h4 class="alert-heading">No Notifications Available</h4>
+    </div>
+}
+
+<partial name="_FeedbackModal" />
+
+@section Scripts {
+    <script src="~/js/notificationManagement.js"></script>
+}

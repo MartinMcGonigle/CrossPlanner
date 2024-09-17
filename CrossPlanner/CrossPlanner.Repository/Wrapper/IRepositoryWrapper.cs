@@ -29,6 +29,8 @@ namespace CrossPlanner.Repository.Wrapper
 
         IWorkoutRepository WorkoutRepository { get; }
 
+        INotificationRepository NotificationRepository { get; }
+
         void Save();
 
         Task SaveAsync();

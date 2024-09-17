@@ -35,6 +35,8 @@ namespace CrossPlanner.Domain.Context
         
         public DbSet<Workout> Workouts { get; set; }
 
+        public DbSet<Notification> Notifications { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

@@ -1,0 +1,92 @@
+﻿@model NotificationViewModel
+@{
+    ViewData[""] = "Create Notification";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-chevron-left" aria-hidden="true"></i> Go Back</a>
+    </div>
+</div>
+
+<div class="d-flex justify-content-center align-items-center">
+    <div class="col-md-5">
+        <section>
+            <form id="notification" method="post">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h3>Create notification</h3>
+                        <hr />
+
+                        <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Notification.Title" id="title" class="form-control" aria-required="true" />
+                            <label asp-for="Notification.Title" class="form-label">Title <span class="required">*</span></label>
+                            <span asp-validation-for="Notification.Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <textarea asp-for="Notification.Message" id="message" class="form-control"></textarea>
+                            <label asp-for="Notification.Message" class="form-label">Message <span class="required">*</span></label>
+                            <span asp-validation-for="Notification.Message" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <table id="account-table" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>
+
+                                        </th>
+
+                                        <th>
+                                            Email
+                                        </th>
+
+                                        <th>
+                                            Name
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="account-table-body">
+                                    @foreach (var affiliateUsers in Model.AffiliateUsers)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <input id="account_@(affiliateUsers.ApplicationUser.Id)"
+                                                       name="Notification.UserGrantAcess"
+                                                       type="checkbox"
+                                                       value="@affiliateUsers.ApplicationUser.Id"
+                                                       class="form-check-input user-checkbox"
+                                                @(Model.Notification.UserGrantAcess.Contains(affiliateUsers.ApplicationUser.Id) ? "checked" : "") />
+                                            </td>
+
+                                            <td>
+                                                @affiliateUsers.ApplicationUser.Email
+                                            </td>
+
+                                            <td>
+                                                @affiliateUsers.ApplicationUser.FirstName @affiliateUsers.ApplicationUser.LastName
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mb-1">
+                            <button id="notification-submit" type="submit" class="w-100 btn btn-lg btn-green" disabled><i class="fa fa-file" aria-hidden="true"></i> Create Notification</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/notification.js"></script>
+    <script src="https://cdn.tiny.cloud/1/xw8xkoojtvykcvro8yxpp136emxqubkscfbkpn8if4fqeeux/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+}

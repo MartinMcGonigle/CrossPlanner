@@ -1,0 +1,9 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+
+<div class="navbar-text text-center flex-grow-1">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <span class="h3 affiliate-name">@User.FindFirst("AffiliateName")?.Value</span>
+    }
+</div>
