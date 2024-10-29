@@ -37,6 +37,12 @@ namespace CrossPlanner.Domain.Context
 
         public DbSet<Notification> Notifications { get; set; }
 
+        public DbSet<MailGroup> MailGroups { get; set; }
+
+        public DbSet<MailDetails> MailDetails { get; set; }
+
+        public DbSet<MailGroupDetails> MailGroupDetails { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

@@ -31,6 +31,12 @@ namespace CrossPlanner.Repository.Wrapper
 
         INotificationRepository NotificationRepository { get; }
 
+        IMailGroupRepository MailGroupRepository { get; }
+
+        IMailDetailsRepository MailDetailsRepository {  get; }
+
+        IMailGroupDetailsRepository MailGroupDetailsRepository { get; }
+
         void Save();
 
         Task SaveAsync();

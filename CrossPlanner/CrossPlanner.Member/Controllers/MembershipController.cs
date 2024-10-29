@@ -4,6 +4,8 @@ using CrossPlanner.Domain.OtherModels;
 using CrossPlanner.Repository.Wrapper;
 using CrossPlanner.Service.Stripe;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -18,6 +20,8 @@ namespace CrossPlanner.Member.Controllers
         private readonly IRepositoryWrapper _repositoryWrapper;
         private readonly IStripeService _stripeService;
         private readonly IOptions<StripeSettings> _stripeSettings;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IEmailSender _emailSender;
         private const string logPrefix = "Ctlr|Membership";
 
         public MembershipController(
@@ -25,13 +29,17 @@ namespace CrossPlanner.Member.Controllers
             IRepositoryWrapper repositoryWrapper,
             IHttpContextAccessor httpContextAccessor,
             IStripeService stripeService,
-            IOptions<StripeSettings> stripeSettings)
+            IOptions<StripeSettings> stripeSettings,
+            SignInManager<ApplicationUser> signInManager,
+            IEmailSender emailSender)
             : base(httpContextAccessor)
         {
             _logger = logger;
             _repositoryWrapper = repositoryWrapper;
             _stripeService = stripeService;
             _stripeSettings = stripeSettings;
+            _signInManager = signInManager;
+            _emailSender = emailSender;
 
             Steps = new LinkedList<StepViewModel>();
             Steps.AddLast(new StepViewModel { Name = nameof(MembershipSelection), Title = "Select Membership" });
@@ -42,10 +50,20 @@ namespace CrossPlanner.Member.Controllers
         }
 
         [HttpGet("membership-selection")]
-        public IActionResult MembershipSelection(int membershipId)
+        public async Task<IActionResult> MembershipSelection(int membershipId)
         {
             try
             {
+                Int32.TryParse(User.FindFirst("Affiliate")?.Value, out int affiliateId);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (affiliateId == 0 || string.IsNullOrEmpty(userId))
+                {
+                    _logger.LogWarning($"{logPrefix} - Redirecting user to login page as affiliateId was {affiliateId} or userId is missing");
+                    await _signInManager.SignOutAsync();
+                    return RedirectToPage("/Account/Login", new { area = "Identity" });
+                }
+
                 var existingMembership = CheckForExistingMembership();
 
                 if (existingMembership != null)
@@ -58,7 +76,6 @@ namespace CrossPlanner.Member.Controllers
                     .FindByCondition(m => m.MembershipId == membershipId && m.MemberId == _userId)
                     .FirstOrDefault() ?? new Membership();
 
-                Int32.TryParse(User.FindFirst("Affiliate")?.Value, out int affiliateId);
                 var membershipPlans = GetAffiliateMembershipPlans(affiliateId);
 
                 var viewModel = new MembershipSelectionViewModel
@@ -106,13 +123,11 @@ namespace CrossPlanner.Member.Controllers
                     return View("Error");
                 }
 
+                model.Membership.EndDate = DateTime.Today.AddMonths(1).AddDays(-1).AddHours(23).AddMinutes(59);
+
                 if (membershipPlan.Type == (int)MembershipType.Monthly)
                 {
                     model.Membership.EndDate = DateTime.Today.AddMonths((int)membershipPlan.NumberOfMonths).AddDays(-1).AddHours(23).AddMinutes(59);
-                }
-                else if (membershipPlan.Type == (int)MembershipType.Weekly || membershipPlan.Type == (int)MembershipType.Unlimited)
-                {
-                    model.Membership.EndDate = DateTime.Today.AddMonths(1).AddDays(-1).AddHours(23).AddMinutes(59);
                 }
 
                 model.Membership.StartDate = DateTime.Today;
@@ -138,10 +153,20 @@ namespace CrossPlanner.Member.Controllers
         }
 
         [HttpGet("membership-details")]
-        public IActionResult MembershipDetails(int membershipId)
+        public async Task<IActionResult> MembershipDetails(int membershipId)
         {
             try
             {
+                Int32.TryParse(User.FindFirst("Affiliate")?.Value, out int affiliateId);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (affiliateId == 0 || string.IsNullOrEmpty(userId))
+                {
+                    _logger.LogWarning($"{logPrefix} - Redirecting user to login page as affiliateId was {affiliateId} or userId is missing");
+                    await _signInManager.SignOutAsync();
+                    return RedirectToPage("/Account/Login", new { area = "Identity" });
+                }
+
                 var existingMembership = CheckForExistingMembership();
 
                 if (existingMembership != null)
@@ -206,10 +231,20 @@ namespace CrossPlanner.Member.Controllers
         }
 
         [HttpGet("review")]
-        public IActionResult Review(int membershipId)
+        public async Task<IActionResult> Review(int membershipId)
         {
             try
             {
+                Int32.TryParse(User.FindFirst("Affiliate")?.Value, out int affiliateId);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (affiliateId == 0 || string.IsNullOrEmpty(userId))
+                {
+                    _logger.LogWarning($"{logPrefix} - Redirecting user to login page as affiliateId was {affiliateId} or userId is missing");
+                    await _signInManager.SignOutAsync();
+                    return RedirectToPage("/Account/Login", new { area = "Identity" });
+                }
+
                 var existingMembership = CheckForExistingMembership();
 
                 if (existingMembership != null)
@@ -220,7 +255,7 @@ namespace CrossPlanner.Member.Controllers
 
                 var membership = _repositoryWrapper.MembershipRepository
                     .FindByCondition(m => m.MembershipId == membershipId && m.MemberId == _userId)
-                    .Include("MembershipPlan")
+                    .Include(m => m.MembershipPlan)
                     .FirstOrDefault();
 
                 if (membership == null)
@@ -242,10 +277,20 @@ namespace CrossPlanner.Member.Controllers
         }
 
         [HttpGet("payment-details")]
-        public IActionResult PaymentDetails(int membershipId)
+        public async Task<IActionResult> PaymentDetails(int membershipId)
         {
             try
             {
+                Int32.TryParse(User.FindFirst("Affiliate")?.Value, out int affiliateId);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (affiliateId == 0 || string.IsNullOrEmpty(userId))
+                {
+                    _logger.LogWarning($"{logPrefix} - Redirecting user to login page as affiliateId was {affiliateId} or userId is missing");
+                    await _signInManager.SignOutAsync();
+                    return RedirectToPage("/Account/Login", new { area = "Identity" });
+                }
+
                 var existingMembership = CheckForExistingMembership();
 
                 if (existingMembership != null)
@@ -295,7 +340,7 @@ namespace CrossPlanner.Member.Controllers
 
                 var membership = _repositoryWrapper.MembershipRepository
                     .FindByCondition(m => m.MembershipId == membershipId && m.MemberId == _userId)
-                    .Include("MembershipPlan")
+                    .Include(m => m.MembershipPlan)
                     .FirstOrDefault();
 
                 if (membership == null)
@@ -333,6 +378,70 @@ namespace CrossPlanner.Member.Controllers
                     _repositoryWrapper.Save();
 
                     StoreStripeCustomerId(customer.Id, affiliateId);
+
+                    string userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+                    var emailSubject = "Membership Purchase Confirmation";
+                    var emailBody = $@"Hi {User.Identity.Name}, <br/><br/>
+                    Thank you for purchasing a membership. Outlined below are the details of your membership: <br/><br/>
+                    <div class='mb-3'>
+                        <table style='border-collapse: collapse; width: 100%;'>
+                            <tbody>
+                                <tr style='border-bottom: 1px solid #ddd;'>
+                                    <td style='padding: 8px;'><b>Membership:</b></td>
+                                    <td style='padding: 8px;'>{membership.MembershipPlan.Title}</td>
+                                </tr>
+                                <tr style='border-bottom: 1px solid #ddd;'>
+                                    <td style='padding: 8px;'><b>Price:</b></td>
+                                    <td style='padding: 8px;'>{string.Format("{0:N2}", membership.MembershipPlan.Price)}</td>
+                                </tr>";
+
+                    if (membership.MembershipPlan.Type == (int)MembershipType.Weekly)
+                    {
+                        emailBody += $@"
+                                    <tr style='border-bottom: 1px solid #ddd;'>
+                                        <td style='padding: 8px;'><b>Number of Classes Per Week:</b></td>
+                                        <td style='padding: 8px;'>{membership.MembershipPlan.NumberOfClasses}</td>
+                                    </tr>";
+                    }
+                    else if (membership.MembershipPlan.Type == (int)MembershipType.Monthly)
+                    {
+                        emailBody += $@"
+                                    <tr style='border-bottom: 1px solid #ddd;'>
+                                        <td style='padding: 8px;'><b>Number of Classes:</b></td>
+                                        <td style='padding: 8px;'>{membership.MembershipPlan.NumberOfClasses}</td>
+                                    </tr>
+                                    <tr style='border-bottom: 1px solid #ddd;'>
+                                        <td style='padding: 8px;'><b>Number of Months:</b></td>
+                                        <td style='padding: 8px;'>{membership.MembershipPlan.NumberOfMonths}</td>
+                                    </tr>";
+                    }
+                    else if (membership.MembershipPlan.Type == (int)MembershipType.Unlimited)
+                    {
+                        emailBody += $@"
+                                    <tr style='border-bottom: 1px solid #ddd;'>
+                                        <td style='padding: 8px;'><b>Number of Classes:</b></td>
+                                        <td style='padding: 8px;'>Unlimited</td>
+                                    </tr>";
+                    }
+
+                    emailBody += $@"
+                                <tr style='border-bottom: 1px solid #ddd;'>
+                                    <td style='padding: 8px;'><b>Start Date:</b></td>
+                                    <td style='padding: 8px;'>{membership.StartDate.ToShortDateString()}</td>
+                                </tr>
+                                <tr style='border-bottom: 1px solid #ddd;'>
+                                    <td style='padding: 8px;'><b>End Date:</b></td>
+                                    <td style='padding: 8px;'>{membership.EndDate?.ToShortDateString()}</td>
+                                </tr>
+                                <tr style='border-bottom: 1px solid #ddd;'>
+                                    <td style='padding: 8px;'><b>Auto Renew:</b></td>
+                                    <td style='padding: 8px;'>{(membership.AutoRenew ? "Yes" : "No")}</td>
+                                </tr>
+                                </tbody>
+                                </table>
+                                </div>";
+
+                    await _emailSender.SendEmailAsync(userEmail, emailSubject, emailBody);
 
                     return RedirectToAction(NextStep.Name);
                 }

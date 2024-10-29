@@ -12,6 +12,11 @@
             </li>
 
             <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "ReservedClass" ? "active" : "")"
+                   asp-controller="ReservedClass" asp-action="Index">Reserved Classes</a>
+            </li>
+
+            <li class="nav-item">
                 <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Workout" ? "active" : "")"
                    asp-controller="Workout" asp-action="Index">Workouts</a>
             </li>
@@ -24,6 +29,11 @@
             <li class="nav-item">
                 <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Membership" ? "active" : "")"
                    asp-controller="Membership" asp-action="MembershipSelection">Purchase</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Profile" ? "active" : "")"
+                   asp-controller="Profile" asp-action="Index">Profile</a>
             </li>
 
             <li class="nav-item">

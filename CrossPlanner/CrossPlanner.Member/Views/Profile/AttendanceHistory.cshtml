@@ -1,0 +1,73 @@
+﻿@model AttendanceHistoryViewModel
+@{
+    ViewData["Title"] = "Attendance History";
+}
+
+<div class="container mt-5">
+    <h3 class="text-center">Attendance</h3>
+
+    <div class="row mb-5">
+        <div class="col-md-6 offset-md-3 text-center">
+            <h5>Check-in Summary</h5>
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-sm-4">
+                    <div class="attendance-summary-circle shadow-lg rounded-circle">
+                        <h2>@Model.AttendanceHistoryWeekly</h2>
+                        <p class="text-muted">This Week</p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-sm-4">
+                    <div class="attendance-summary-circle shadow-lg rounded-circle">
+                        <h2>@Model.AttendanceHistoryMonthly</h2>
+                        <p class="text-muted">This Month</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h5>Attendance History</h5>
+    @if (Model.ScheduledClassReservations != null && Model.ScheduledClassReservations.Any())
+    {
+        <div class="container mt-4">
+            <div class="list-group">
+                @foreach (var reservation in Model.ScheduledClassReservations.OrderByDescending(scr => scr.ScheduledClass.StartDateTime))
+                {
+                    <div class="list-group-item mb-4 p-4 shadow-lg rounded border">
+                        <div class="d-flex w-100 justify-content-between align-items-center mb-2">
+                            <h5 class="mb-1">
+                                <i class="fas fa-dumbbell me-2"></i> @reservation.ScheduledClass.ClassType.Title
+                            </h5>
+                            <small class="text-muted">
+                                <i class="far fa-clock me-1"></i>
+                                @reservation.ScheduledClass.StartDateTime.ToString("MMMM dd, yyyy") |
+                                @reservation.ScheduledClass.StartDateTime.ToString("h:mm tt") - @reservation.ScheduledClass.EndDateTime.ToString("h:mm tt")
+                            </small>
+                        </div>
+
+                        <p class="mb-2">
+                            <i class="fas fa-user-tie me-2"></i>
+                            Instructor: @reservation.ScheduledClass.Instructor.FirstName @reservation.ScheduledClass.Instructor.LastName
+                        </p>
+
+                        <p class="mb-1">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            Affiliate: @reservation.ScheduledClass.ClassType.Affiliate.Name
+                        </p>
+
+                    </div>
+
+                }
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info mt-4 text-center">
+            <p>No attendance records available.</p>
+        </div>
+    }
+</div>
+

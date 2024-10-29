@@ -24,5 +24,11 @@ namespace CrossPlanner.Domain.Models
 
         [NotMapped]
         public string UserRoles { get; set; }
+
+        public string? ProfilePictureUrl { get; set; }
+
+        public bool DisplayNameVisibility { get; set; } = true;
+
+        public bool ProfilePictureVisibility { get; set; } = true;
     }
 }

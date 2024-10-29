@@ -3,26 +3,40 @@
     ViewData["Title"] = "Notifications";
 }
 
-@if (Model.Any())
-{
-    <div class="container">
-        @foreach (var notification in Model)
-        {
-            <div class="card mb-3 shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">@notification.Title</h5>
-                    <small class="text-muted">Posted on @notification.CreatedDate.ToString("MMMM dd, yyyy")</small>
+<div class="container mt-5">
+    <h3 class="text-center">Notifications</h3>
+    @if (Model.Any())
+    {
+        <div class="container mt-4">
+            @foreach (var notification in Model)
+            {
+                <div class="card mb-4 shadow-lg rounded border">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <h5 class="card-title mb-0">@notification.Title</h5>
+                        </div>
+
+                        <small class="text-muted">
+                            <!-- Show "Today" or "Yesterday" if within the last 24/48 hours -->
+                            @{
+                                var timeSincePost = DateTime.Now - notification.CreatedDate;
+                                var postedDate = timeSincePost.TotalDays < 1 ? "Today" : (timeSincePost.TotalDays < 2 ? "Yesterday" : notification.CreatedDate.ToString("MMMM dd, yyyy"));
+                            }
+                            Posted on @postedDate
+                        </small>
+                    </div>
+
+                    <div class="card-body">
+                        <p class="card-text"> @Html.Raw(notification.Message)</p>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <p class="card-text"> @Html.Raw(notification.Message)</p>
-                </div>
-            </div>
-        }
-    </div>
-}
-else
-{
-    <div class="alert alert-info mt-4 text-center">
-        No notifications available at this time.
-    </div>
-}
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info mt-4 text-center">
+            No notifications available at this time.
+        </div>
+    }
+</div>

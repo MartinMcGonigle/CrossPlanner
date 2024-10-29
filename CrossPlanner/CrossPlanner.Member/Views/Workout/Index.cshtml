@@ -3,8 +3,8 @@
     ViewData["Title"] = "Workouts";
 }
 
-<div class="container">
-    <div class="row my-3">
+<div class="container mt-5">
+    <div class="row">
         <div class="col text-start">
             <a asp-action="Index" asp-route-date="@Model.SelectedDate.AddDays(-1).ToString("yyyy-MM-dd")" class="btn btn-secondary">
                 <i class="fas fa-chevron-left" aria-hidden="true"></i>
@@ -13,6 +13,9 @@
 
         <div class="col text-center">
             <h3>@Model.SelectedDate.ToString("dddd, MMMM d")</h3>
+            <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#datePickerModal">
+                <i class="fas fa-calendar-alt" aria-hidden="true"></i> Pick a Date
+            </button>
         </div>
 
         <div class="col text-end">
@@ -24,12 +27,19 @@
 
     @if (Model.Workouts.Any())
     {
-        <ul class="nav nav-tabs" id="workoutTab" role="tablist">
+        <ul class="nav nav-tabs mt-4" id="workoutTab" role="tablist">
             @for (var i = 0; i < Model.Workouts.Count; i++)
             {
                 var workout = Model.Workouts[i];
+                var normalizedTitle = workout.ClassType?.Title?.Replace(" ", "-").ToLower();
                 <li class="nav-item" role="presentation">
-                    <a class="nav-link @((i == 0) ? "active" : "")" id="@workout.ClassType?.Title-tab" data-bs-toggle="tab" href="#@workout.ClassType?.Title" role="tab" aria-controls="@workout.ClassType?.Title" aria-selected="@(i == 0 ? "true" : "false")">
+                    <a class="nav-link @((i == 0) ? "active" : "")"
+                       id="@normalizedTitle-tab"
+                       data-bs-toggle="tab"
+                       href="#@normalizedTitle"
+                       role="tab"
+                       aria-controls="@normalizedTitle"
+                       aria-selected="@(i == 0 ? "true" : "false")">
                         @workout.ClassType?.Title
                     </a>
                 </li>
@@ -40,10 +50,15 @@
             @for (var i = 0; i < Model.Workouts.Count; i++)
             {
                 var workout = Model.Workouts[i];
-                <div class="tab-pane fade @((i == 0) ? "show active" : "")" id="@workout.ClassType?.Title" role="tabpanel" aria-labelledby="@workout.ClassType.Title-tab">
-                    <div class="card">
+                var normalizedTitle = workout.ClassType?.Title?.Replace(" ", "-").ToLower();
+
+                <div class="tab-pane fade @((i == 0) ? "show active" : "")"
+                     id="@normalizedTitle"
+                     role="tabpanel"
+                     aria-labelledby="@normalizedTitle-tab">
+                    <div class="card shadow-sm">
                         <div class="card-body">
-                            <div class="row my-2">
+                            <div class="row mb-3">
 
                                 <div class="col text-start">
                                 </div>
@@ -56,8 +71,8 @@
 
                                 </div>
                             </div>
-
-                            @Html.Raw(workout.Description)
+                            <hr />
+                                @Html.Raw(workout.Description)
                         </div>
                     </div>
                 </div>
@@ -72,3 +87,9 @@
         </div>
     }
 </div>
+
+<partial name="_DatePickerModal" />
+
+@section Scripts {
+    <script src="~/js/datePicker.js"></script>
+}

@@ -41,10 +41,11 @@ namespace CrossPlanner.Member.Controllers
             _logger.LogInformation($"{logPrefix} - Attempting to display notifications for affiliate with id {affiliateId} and user id {userId}");
 
             var notifications = _repositoryWrapper.NotificationRepository
-                .FindByCondition(n => n.AffiliateId == affiliateId
-                && !n.IsDeleted
-                && n.IsActive
-                && n.UserAccess.Contains(userId))
+                .FindByCondition(n =>
+                n.AffiliateId == affiliateId &&
+                !n.IsDeleted &&
+                n.IsActive &&
+                n.UserAccess.Contains(userId))
                 .OrderByDescending(n => n.NotificationId)
                 .ToList();
 

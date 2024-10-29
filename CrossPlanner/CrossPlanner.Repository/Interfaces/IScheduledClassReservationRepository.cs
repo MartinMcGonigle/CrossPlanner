@@ -10,5 +10,9 @@ namespace CrossPlanner.Repository.Interfaces
         public int GetMemberClassAttendanceByWeek(int membershipId, DateTime startOfWeek, DateTime endOfWeek);
 
         public List<ClassAttendeeViewModel> GetClassAttendeesByScheduledClassId(int scheduledClassId);
+
+        public void DeleteFutureScheduledClassReservations(int membershipId, DateTime dateTime);
+
+        public void UpdateFutureScheduledClassReservationMembershipId(int oldMembershipId, int newMembershipId, DateTime startDateTime);
     }
 }

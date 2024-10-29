@@ -1,9 +1,13 @@
-﻿namespace CrossPlanner.Domain.Enums
+﻿using System.ComponentModel;
+
+namespace CrossPlanner.Domain.Enums
 {
     public enum PaymentStatus
     {
+        [Description("Paid")]
         Paid,
 
-        Refunded
+        [Description("Refunded")]
+        Refunded,
     }
 }

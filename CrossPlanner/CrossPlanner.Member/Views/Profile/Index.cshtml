@@ -1,0 +1,63 @@
+﻿@model ProfileViewModel
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4 text-center">
+            @if (!string.IsNullOrEmpty(Model.ProfilePictureUrl))
+            {
+                <img src="@Model.ProfilePictureUrl" class="img-fluid rounded-circle mb-3 profile-picture" alt="@Model.FirstName @Model.LastName Profile Picture" />
+            }
+            else
+            {
+                <img src="~/images/default-profile.png" class="img-fluid rounded-circle mb-3 profile-picture" alt="Default Profile Picture" />
+            }
+
+            <p>@Model.FirstName @Model.LastName</p>
+            <p>@Model.DateOfBirth.ToShortDateString()</p>
+            <p>Allow others to see name: @(Model.DisplayNameVisibility ? "Yes" : "No")</p>
+            <p>Allow others to see picture: @(Model.ProfilePictureVisibility ? "Yes" : "No")</p>
+            <p>@Model.Email</p>
+
+            <a class="btn btn-primary mt-2" asp-controller="Profile" asp-action="Edit" asp-route-applicationUserId="@Model.ApplicationUserId"><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
+            <a class="btn btn-secondary mt-2" asp-controller="Profile" asp-action="UploadProfilePicture" asp-route-applicationUserId="@Model.ApplicationUserId">
+                <i class="fas fa-camera" aria-hidden="true"></i> Change Profile Picture
+            </a>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Membership Information</h5>
+                    <hr />
+
+                    @if (string.IsNullOrEmpty(Model.MembershipPlanTitle))
+                    {
+                        <p>You do not have an active membership at the moment.</p>
+                    }
+                    else
+                    {
+                        <p><strong>Membership Plan:</strong> @Model.MembershipPlanTitle</p>
+                        <p><strong>Start Date:</strong> @Model.MembershipStartDate.ToShortDateString()</p>
+                        <p><strong>End Date:</strong> @Model.MembershipEndDate?.ToShortDateString()</p>
+                        <p><strong>Auto Renew:</strong> @(Model.MembershipAutoRenew == true ? "Yes" : "No")</p>
+                    }
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">More</h5>
+                    <hr />
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <a asp-action="Bills" asp-controller="Profile" class="list-group-item list-group-item-action">Bills</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a asp-action="AttendanceHistory" asp-controller="Profile" class="list-group-item list-group-item-action">Attendance History</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

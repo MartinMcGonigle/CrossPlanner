@@ -30,7 +30,7 @@
                             <select asp-for="Workout.ClassTypeId" id="class-type-id" class="form-control" aria-required="true">
                                 <option disabled selected value="">-- Select Class Type --</option>
                                 @foreach (var classType in Model.ClassTypes)
-                                {
+                                {  
                                     <option value="@classType.ClassTypeId">@classType.Title</option>
                                 }
                             </select>

@@ -1,5 +1,5 @@
 ﻿document.addEventListener('DOMContentLoaded', function () {
-    const stripe = Stripe('pk_test_51PfKoV2LZAPH4Vf6rbHMetDjkM8geRJgH5oZXbicyjaGRrfwwQsWLXpvIoFOAFe885WP0zrhaREx9GYSGwvoE8SH00MBRJqFGl');
+    const stripe = Stripe('pk_test_51PneMlHI7dJqndehsRvyOVtWD6dVlbzNuwzgC46CksagfmMnAmVunoqzTU9jKNditLwPEx95D1mMiIZkMvDAgagx002YPYLR1U');
     let elements = stripe.elements();
 
     const style = {

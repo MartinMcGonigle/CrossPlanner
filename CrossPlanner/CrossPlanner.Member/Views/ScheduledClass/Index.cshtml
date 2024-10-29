@@ -20,6 +20,9 @@
 
         <div class="col text-center">
             <h3>@Model.SelectedDate.ToString("dddd, MMMM d")</h3>
+            <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#datePickerModal">
+                <i class="fas fa-calendar-alt" aria-hidden="true"></i> Pick a Date
+            </button>
         </div>
 
         <div class="col text-end">
@@ -82,7 +85,9 @@
 </div>
 
 <partial name="_FeedbackModal" />
+<partial name="_DatePickerModal" />
 
 @section Scripts {
     <script src="~/js/scheduledClassManagement.js"></script>
+    <script src="~/js/datePicker.js"></script>
 }

@@ -69,5 +69,53 @@ namespace CrossPlanner.Repository.Repository
 
             return attendees;
         }
+
+        public void DeleteFutureScheduledClassReservations(int membershipId, DateTime dateTime)
+        {
+            using (var connection = new SqlConnection(_applicationContext.Database.GetDbConnection().ConnectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    var dynamicParameters = new DynamicParameters();
+                    dynamicParameters.Add("membershipId", membershipId);
+                    dynamicParameters.Add("startDateTime", dateTime);
+                    connection.Execute("spDeleteFutureScheduledClassReservation", dynamicParameters, commandType: CommandType.StoredProcedure);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Error executing spDeleteFutureScheduledClassReservation", ex);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+
+        public void UpdateFutureScheduledClassReservationMembershipId(int oldMembershipId, int newMembershipId, DateTime startDateTime)
+        {
+            using (var connection = new SqlConnection(_applicationContext.Database.GetDbConnection().ConnectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    var dynamicParameters = new DynamicParameters();
+                    dynamicParameters.Add("oldMembershipId", oldMembershipId);
+                    dynamicParameters.Add("newMembershipId", newMembershipId);
+                    dynamicParameters.Add("startDateTime", startDateTime);
+
+                    connection.Execute("spUpdateFutureScheduledClassReservationMembershipId", dynamicParameters, commandType: CommandType.StoredProcedure);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Error executing spUpdateFutureScheduledClassReservationMembershipId", ex);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
     }
 }

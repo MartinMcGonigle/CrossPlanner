@@ -210,6 +210,51 @@ namespace CrossPlanner.Repository.Wrapper
             }
         }
 
+        private IMailGroupRepository _mailGroupRepository;
+        
+        public IMailGroupRepository MailGroupRepository
+        {
+            get
+            {
+                if (_mailGroupRepository == null)
+                {
+                    _mailGroupRepository = new MailGroupRepository(_applicationContext);
+                }
+
+                return _mailGroupRepository;
+            }
+        }
+
+        private IMailDetailsRepository _mailDetailsRepository;
+
+        public IMailDetailsRepository MailDetailsRepository
+        {
+            get
+            {
+                if (_mailDetailsRepository == null)
+                {
+                    _mailDetailsRepository = new MailDetailsRepository(_applicationContext);
+                }
+
+                return _mailDetailsRepository;
+            }
+        }
+
+        private IMailGroupDetailsRepository _mailGroupDetailsRepository;
+
+        public IMailGroupDetailsRepository MailGroupDetailsRepository
+        {
+            get
+            {
+                if (_mailGroupDetailsRepository == null)
+                {
+                    _mailGroupDetailsRepository = new MailGroupDetailsRepository(_applicationContext);
+                }
+
+                return _mailGroupDetailsRepository;
+            }
+        }
+
         public void Save()
         {
             _applicationContext.SaveChanges();

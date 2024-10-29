@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using CrossPlanner.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using CrossPlanner.Domain.OtherModels;
+using System.Security.Claims;
 
 namespace CrossPlanner.Member.Controllers
 {
@@ -29,19 +30,21 @@ namespace CrossPlanner.Member.Controllers
         public async Task<IActionResult> Index(DateTime? date)
         {
             Int32.TryParse(User.FindFirst("Affiliate")?.Value, out int affiliateId);
-            var selectedDate = date ?? DateTime.Today;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (affiliateId == 0)
+            if (affiliateId == 0 || string.IsNullOrEmpty(userId))
             {
-                _logger.LogWarning($"{logPrefix} - Redirecting user to login page as affiliateId was {affiliateId}");
+                _logger.LogWarning($"{logPrefix} - Redirecting user to login page as affiliateId was {affiliateId} or userId is missing");
                 await _signInManager.SignOutAsync();
                 return RedirectToPage("/Account/Login", new { area = "Identity" });
             }
 
+            var selectedDate = date ?? DateTime.Today;
             _logger.LogInformation($"{logPrefix} - Attempting to display workouts for affiliate with id {affiliateId} on {selectedDate.ToShortDateString()}");
-            
+
             var workouts = _repositoryWrapper.WorkoutRepository
-                .FindByCondition(w => w.ClassType.AffiliateId == affiliateId
+                .FindByCondition(w =>
+                w.ClassType.AffiliateId == affiliateId
                 && w.Date == selectedDate
                 && w.IsActive
                 && !w.IsDeleted)

@@ -1,0 +1,60 @@
+﻿@using CrossPlanner.Domain.Enums
+@model IEnumerable<Membership>
+@{
+    ViewData["Title"] = "Bills";
+}
+
+<div class="container mt-5">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Affiliate
+                </th>
+                <th>
+                    Title
+                </th>
+
+                <th>
+                    Start Date
+                </th>
+
+                <th>
+                    End Date
+                </th>
+
+                <th>
+                    Payment Amount
+                </th>
+
+                <th>
+                    Payment Status
+                </th>
+
+                <th>
+                    Refund Amount
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var bill in Model)
+            {
+                <tr>
+                    <td>@bill.MembershipPlan.Affiliate.Name</td>
+                    <td>@bill.MembershipPlan.Title</td>
+                    <td>@bill.StartDate.ToShortDateString()</td>
+                    <td>@bill.EndDate?.ToShortDateString()</td>
+                    <td>@string.Format("{0:N2}", bill.LastPaymentAmount)</td>
+                    <td>@(Enum.GetName(typeof(PaymentStatus), bill.PaymentStatus))</td>
+                    <td>
+                        @if (bill.Refunds != null && bill.Refunds.Any())
+                        {
+                            var totalRefund = bill.Refunds.Sum(r => r.Amount);
+                            @string.Format("{0:N2}", totalRefund)
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
