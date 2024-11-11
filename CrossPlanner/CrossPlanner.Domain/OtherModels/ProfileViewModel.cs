@@ -18,12 +18,14 @@
 
         public bool ProfilePictureVisibility { get; set; }
 
-        public string MembershipPlanTitle { get; set; }
+        public string? MembershipPlanTitle { get; set; }
 
-        public bool MembershipAutoRenew { get; set; }
+        public bool? MembershipAutoRenew { get; set; }
 
-        public DateTime MembershipStartDate { get; set; }
+        public DateTime? MembershipStartDate { get; set; }
 
         public DateTime? MembershipEndDate { get; set; }
+
+        public int MembershipId { get; set; }
     }
 }

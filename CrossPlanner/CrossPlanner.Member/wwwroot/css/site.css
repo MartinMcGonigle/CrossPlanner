@@ -1,4 +1,4 @@
-html {
+dhtml {
   font-size: 14px;
 }
 
@@ -142,10 +142,12 @@ h3 {
 }
 
 .profile-picture {
-    width: 150px;
-    height: 150px;
+    width: 200px;
+    height: 200px;
     object-fit: cover;
     margin: 0 auto;
+    object-fit: cover;
+    border: 1px solid #ffffff;
 }
 
 .whos-coming-card {
@@ -211,6 +213,25 @@ h3 {
     align-items: center;
     margin: auto;
 }
+
+.profile-picture-preview {
+    width: 200px;
+    height: 200px;
+    object-fit: cover; /* Ensures the image fills the preview box */
+    border: 2px solid #ddd;
+    /* Remove any border-radius to keep it square */
+}
+
+
+/* Smaller thumbnail display at 200x200 */
+.profile-thumbnail {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 50%; /* Circular display */
+    border: 2px solid;
+}
+
 
 
 

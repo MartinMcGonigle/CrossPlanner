@@ -40,6 +40,37 @@
                             <span asp-validation-for="DateOfBirth" class="text-danger"></span>
                         </div>
 
+                        <div class="mb-3">
+                            <label class="form-check-label">Allow other members to see name?</label>
+                            <div>
+                                <input type="radio" id="DisplayNameVisibilityYes" name="DisplayNameVisibility" value="true"
+                                @(Model.DisplayNameVisibility == true ? "checked" : "") />
+                                <label for="DisplayNameVisibilityYes">Yes</label>
+                            </div>
+
+                            <div>
+                                <input type="radio" id="DisplayNameVisibilityNo" name="DisplayNameVisibility" value="false"
+                                @(Model.DisplayNameVisibility == false ? "checked" : "") />
+                                <label for="DisplayNameVisibilityNo">No</label>
+
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-check-label">Allow other members to see picture?</label>
+                            <div>
+                                <input type="radio" id="ProfilePictureVisibilityYes" name="ProfilePictureVisibility" value="true"
+                                @(Model.ProfilePictureVisibility == true ? "checked" : "") />
+                                <label for="ProfilePictureVisibilityYes">Yes</label>
+                            </div>
+
+                            <div>
+                                <input type="radio" id="ProfilePictureVisibilityNo" name="ProfilePictureVisibility" value="false"
+                                @(Model.ProfilePictureVisibility == false ? "checked" : "") />
+                                <label for="ProfilePictureVisibilityNo">No</label>
+                            </div>
+                        </div>
+
                         <div class="form-floating mb-3">
                             <input asp-for="Email" id="email" class="form-control" autocomplete="username" aria-required="true" readonly />
                             <label asp-for="Email" class="form-label">Email <span class="required">*</span></label>

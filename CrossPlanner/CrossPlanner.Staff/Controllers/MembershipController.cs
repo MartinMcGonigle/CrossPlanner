@@ -136,7 +136,7 @@ namespace CrossPlanner.Staff.Controllers
                 int totalWeeks = (model.EndDate ?? DateTime.Now).Subtract(model.StartDate).Days / 7;
                 int weeksUsed = DateTime.Now.Subtract(model.StartDate).Days / 7;
                 int weeksLeft = totalWeeks - weeksUsed;
-                decimal weeklyCost = model.LastPaymentAmount / totalWeeks;
+                decimal weeklyCost = (decimal)(model.LastPaymentAmount / totalWeeks);
 
                 return weeklyCost * weeksLeft;
             }
@@ -146,7 +146,7 @@ namespace CrossPlanner.Staff.Controllers
                 int totalDays = (model.EndDate ?? DateTime.Now).Subtract(model.StartDate).Days;
                 int usedDays = DateTime.Now.Subtract(model.StartDate).Days;
                 int unusedDays = totalDays - usedDays;
-                decimal dailyRate = model.LastPaymentAmount / totalDays;
+                decimal dailyRate = (decimal)(model.LastPaymentAmount / totalDays);
 
                 return dailyRate * unusedDays;
             }

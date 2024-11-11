@@ -25,5 +25,9 @@ namespace CrossPlanner.Domain.OtherModels
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
+
+        public bool DisplayNameVisibility { get; set; }
+
+        public bool ProfilePictureVisibility { get; set; }
     }
 }

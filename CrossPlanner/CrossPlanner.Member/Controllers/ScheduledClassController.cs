@@ -80,7 +80,7 @@ namespace CrossPlanner.Member.Controllers
                 ClassName = scheduledClass.ClassType.Title,
                 StartDateTime = scheduledClass.StartDateTime,
                 EndDateTime = scheduledClass.EndDateTime,
-                Attendees = attendees
+                Attendees = attendees,
             };
 
             return View(viewModel);

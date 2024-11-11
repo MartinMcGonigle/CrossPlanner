@@ -63,7 +63,8 @@ namespace CrossPlanner.Repository.Repository
                 {
                     Name = $"{scr.Membership.Member.FirstName} {scr.Membership.Member.LastName}",
                     IsPresent = scr.IsPresent,
-                    ScheduledClassReservationId = scr.ScheduledClassReservationId
+                    ScheduledClassReservationId = scr.ScheduledClassReservationId,
+                    ProfilePictureUrl = scr.Membership.Member.ProfilePictureUrl
                 })
                 .ToList();
 

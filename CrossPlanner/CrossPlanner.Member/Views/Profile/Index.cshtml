@@ -2,42 +2,81 @@
 
 <div class="container mt-5">
     <div class="row">
+
         <div class="col-md-4 text-center">
-            @if (!string.IsNullOrEmpty(Model.ProfilePictureUrl))
-            {
-                <img src="@Model.ProfilePictureUrl" class="img-fluid rounded-circle mb-3 profile-picture" alt="@Model.FirstName @Model.LastName Profile Picture" />
-            }
-            else
-            {
-                <img src="~/images/default-profile.png" class="img-fluid rounded-circle mb-3 profile-picture" alt="Default Profile Picture" />
-            }
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Personal Information</h5>
+                    <hr />
 
-            <p>@Model.FirstName @Model.LastName</p>
-            <p>@Model.DateOfBirth.ToShortDateString()</p>
-            <p>Allow others to see name: @(Model.DisplayNameVisibility ? "Yes" : "No")</p>
-            <p>Allow others to see picture: @(Model.ProfilePictureVisibility ? "Yes" : "No")</p>
-            <p>@Model.Email</p>
+                    @{
+                        var profilePictureUrl = !string.IsNullOrEmpty(Model.ProfilePictureUrl)
+                        ? Model.ProfilePictureUrl
+                        : Url.Content("~/images/default-profile.png");
+                        var altText = !string.IsNullOrEmpty(Model.ProfilePictureUrl)
+                        ? $"{Model.FirstName} {Model.LastName} Profile Picture"
+                        : "Default Profile Picture";
+                    }
 
-            <a class="btn btn-primary mt-2" asp-controller="Profile" asp-action="Edit" asp-route-applicationUserId="@Model.ApplicationUserId"><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
-            <a class="btn btn-secondary mt-2" asp-controller="Profile" asp-action="UploadProfilePicture" asp-route-applicationUserId="@Model.ApplicationUserId">
-                <i class="fas fa-camera" aria-hidden="true"></i> Change Profile Picture
-            </a>
+                    <div class="mb-3">
+
+                        <img src="@profilePictureUrl" class="img-fluid mb-2 profile-picture" alt="@altText" />
+
+                        <div class="d-flex justify-content-center mt-2 gap-2">
+                            <a class="btn btn-warning"
+                               asp-controller="Profile" asp-action="UploadProfilePicture"
+                               asp-route-applicationUserId="@Model.ApplicationUserId">
+                                <i class="fas fa-camera" aria-hidden="true"></i> Edit Picture
+                            </a>
+                            @if (!string.IsNullOrEmpty(Model.ProfilePictureUrl))
+                            {
+                                <a class="btn btn-danger"
+                                   asp-controller="Profile" asp-action="DeleteProfilePicture"
+                                   asp-route-applicationUserId="@Model.ApplicationUserId">
+                                    <i class="fas fa-trash-alt" aria-hidden="true"></i> Delete Picture
+                                </a>
+                            }
+
+                        </div>
+                    </div>
+
+                    <p><strong>@Model.FirstName @Model.LastName</strong></p>
+                    <p>@Model.DateOfBirth.ToShortDateString()</p>
+                    <p>Allow others to see name: @(Model.DisplayNameVisibility ? "Yes" : "No")</p>
+                    <p>Allow others to see picture: @(Model.ProfilePictureVisibility ? "Yes" : "No")</p>
+                    <p>@Model.Email</p>
+
+                    <a class="btn btn-warning mt-2" style="width: 100%;"
+                       asp-controller="Profile" asp-action="Edit"
+                       asp-route-applicationUserId="@Model.ApplicationUserId">
+                        <i class="fas fa-edit" aria-hidden="true"></i> Edit Personal Information
+                    </a>
+                </div>
+            </div>
         </div>
 
         <div class="col-md-8">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Membership Information</h5>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title">Membership Information</h5>
+                        @if (!string.IsNullOrEmpty(Model.MembershipPlanTitle) && Model.MembershipId != 0)
+                        {
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelMembershipModal">
+                                <i class="fas fa-times-circle" aria-hidden="true"></i> Cancel Membership
+                            </button>
+                        }
+                    </div>
                     <hr />
 
-                    @if (string.IsNullOrEmpty(Model.MembershipPlanTitle))
+                    @if (string.IsNullOrEmpty(Model.MembershipPlanTitle) && Model.MembershipId == 0)
                     {
                         <p>You do not have an active membership at the moment.</p>
                     }
                     else
                     {
                         <p><strong>Membership Plan:</strong> @Model.MembershipPlanTitle</p>
-                        <p><strong>Start Date:</strong> @Model.MembershipStartDate.ToShortDateString()</p>
+                        <p><strong>Start Date:</strong> @Model.MembershipStartDate?.ToShortDateString()</p>
                         <p><strong>End Date:</strong> @Model.MembershipEndDate?.ToShortDateString()</p>
                         <p><strong>Auto Renew:</strong> @(Model.MembershipAutoRenew == true ? "Yes" : "No")</p>
                     }
@@ -52,6 +91,7 @@
                         <li class="list-group-item">
                             <a asp-action="Bills" asp-controller="Profile" class="list-group-item list-group-item-action">Bills</a>
                         </li>
+
                         <li class="list-group-item">
                             <a asp-action="AttendanceHistory" asp-controller="Profile" class="list-group-item list-group-item-action">Attendance History</a>
                         </li>
@@ -61,3 +101,56 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="cancelMembershipModal" tabindex="-1" aria-labelledby="cancelMembershipModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelMembershipModalLabel">Cancel Membership</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to cancel your membership? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <div id="cancelFeedback" class="text-start text-danger" style="flex: 1;"></div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <form id="cancelMembershipForm" method="post">
+                    <input type="hidden" name="MembershipId" value="@Model.MembershipId" />
+                    <button type="button" id="confirmCancelBtn" class="btn btn-danger">Confirm Cancel Membership</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("confirmCancelBtn").addEventListener("click", function () {
+        const formData = new FormData(document.getElementById("cancelMembershipForm"));
+
+        fetch("@Url.Action("CancelMembership", "Profile")", {
+            method: "POST",
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                const feedback = document.getElementById("cancelFeedback");
+                if (data.success) {
+                    feedback.classList.replace("text-danger", "text-success");
+                    feedback.textContent = data.message;
+
+                    // Update the UI if membership was successfully canceled
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    feedback.classList.replace("text-success", "text-danger");
+                    feedback.textContent = data.message;
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById("cancelFeedback").textContent = "An error occurred. Please try again.";
+            });
+    });
+</script>
